@@ -1,5 +1,6 @@
 package dev.JustRed23.grandfather.command;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,6 +14,8 @@ public class CommandContext {
     private boolean privateMessage;
     private SlashCommandInteractionEvent slashCommandEvent;
 
+    private JDA jda;
+
     private List<String> args;
 
     public MessageReceivedEvent getMessageReceivedEvent() {
@@ -22,6 +25,7 @@ public class CommandContext {
     public CommandContext setMessageReceivedEvent(MessageReceivedEvent messageReceivedEvent, boolean privateMessage) {
         this.privateMessage = privateMessage;
         this.messageReceivedEvent = messageReceivedEvent;
+        this.jda = messageReceivedEvent.getJDA();
         return this;
     }
 
@@ -31,6 +35,7 @@ public class CommandContext {
 
     public CommandContext setSlashCommandEvent(SlashCommandInteractionEvent slashCommandEvent) {
         this.slashCommandEvent = slashCommandEvent;
+        this.jda = slashCommandEvent.getJDA();
         return this;
     }
 
@@ -45,6 +50,10 @@ public class CommandContext {
 
     public boolean isPrivateMessage() {
         return privateMessage;
+    }
+
+    public JDA getJDA() {
+        return jda;
     }
 
     public List<String> getArgs() {
