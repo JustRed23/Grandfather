@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class SkipCommand extends DefaultMusicCommand {

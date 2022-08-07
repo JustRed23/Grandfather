@@ -1,7 +1,5 @@
 package dev.JustRed23.grandfather.utils;
 
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
