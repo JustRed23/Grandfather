@@ -15,6 +15,7 @@ public class BasicEventListener extends ListenerAdapter {
 
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         //TODO
+        event.getGuild().updateCommands().addCommands(CommandHandler.getCommandData()).queue();
     }
 
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {

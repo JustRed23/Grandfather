@@ -2,6 +2,7 @@ package dev.JustRed23.grandfather;
 
 import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.event.BasicEventListener;
+import dev.JustRed23.grandfather.services.InactivityService;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
@@ -49,6 +50,8 @@ public class App extends Application {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(Activity.listening("to 1970's hits"));
+
+        getServicePool().addService(InactivityService.class);
     }
 
     protected void start() throws Exception {
@@ -62,6 +65,8 @@ public class App extends Application {
         shardManager.addEventListener(new BasicEventListener());
 
         CommandHandler.init();
+
+        shardManager.getGuilds().forEach(guild -> guild.updateCommands().addCommands(CommandHandler.getCommandData()).queue());
     }
 
     protected void stop() throws Exception {
