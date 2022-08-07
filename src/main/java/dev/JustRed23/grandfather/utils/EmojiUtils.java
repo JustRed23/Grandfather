@@ -1,5 +1,7 @@
 package dev.JustRed23.grandfather.utils;
 
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +29,7 @@ public class EmojiUtils {
         StringBuilder bar = new StringBuilder();
         int activeBLock = Math.min(parts - 1, (int) ((float) current / (float) max * parts));
         for (int i = 0; i < parts; i++)
-            bar.append(i == activeBLock ? ":white_circle:" : "▬");
+            bar.append(i == activeBLock ? ":white_circle:" : "\u25AC");
         return bar.toString();
     }
 
