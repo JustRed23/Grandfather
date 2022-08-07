@@ -67,7 +67,7 @@ public class EmbedUtils {
             case PRIVATE -> ((MessageReceivedEvent) event).getChannel().asPrivateChannel().sendMessageEmbeds(embedBuilder.build()).queue();
             case GUILD -> ((MessageReceivedEvent) event).getChannel().asGuildMessageChannel().sendMessageEmbeds(embedBuilder.build()).queue();
             case GUILD_SLASH -> ((SlashCommandInteractionEvent) event).deferReply().queue(response -> response.sendMessageEmbeds(embedBuilder.build()).queue());
-            case UNKNOWN -> throw new IllegalArgumentException("Event type can only be PrivateMessageReceivedEvent, GuildMessageReceivedEvent or SlashCommandEvent");
+            case UNKNOWN -> throw new IllegalArgumentException("Event type can only be one of the following: PRIVATE, GUILD, GUILD_SLASH");
         }
     }
 
@@ -76,7 +76,7 @@ public class EmbedUtils {
             case PRIVATE -> ((MessageReceivedEvent) event).getChannel().asPrivateChannel().sendMessageEmbeds(embedBuilder.build()).setActionRows(actionRows).queue();
             case GUILD -> ((MessageReceivedEvent) event).getChannel().asGuildMessageChannel().sendMessageEmbeds(embedBuilder.build()).setActionRows(actionRows).queue();
             case GUILD_SLASH -> ((SlashCommandInteractionEvent) event).deferReply().queue(response -> response.sendMessageEmbeds(embedBuilder.build()).addActionRows(actionRows).queue());
-            case UNKNOWN -> throw new IllegalArgumentException("Event type can only be PrivateMessageReceivedEvent, GuildMessageReceivedEvent or SlashCommandEvent");
+            case UNKNOWN -> throw new IllegalArgumentException("Event type can only be one of the following: PRIVATE, GUILD, GUILD_SLASH");
         }
     }
 }

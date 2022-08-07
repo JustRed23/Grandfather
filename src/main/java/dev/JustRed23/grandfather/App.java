@@ -6,6 +6,7 @@ import dev.JustRed23.grandfather.services.InactivityService;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
+import dev.JustRed23.stonebrick.version.GitVersion;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -16,15 +17,25 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
 
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Properties;
+
 public class App extends Application {
 
     private static Logger LOGGER;
-
-    private ShardManager shardManager;
+    public static GitVersion version;
+    private static ShardManager shardManager;
     private DefaultShardManagerBuilder builder;
 
     protected void init() throws Exception {
         LOGGER = SBLogger.getLogger(Bot.name);
+        version = GitVersion.fromFile(getClass().getClassLoader().getResourceAsStream("application.properties"));
         FileStructure.discover(GFS.class);
         builder = DefaultShardManagerBuilder.createDefault(Bot.token)
                 .setBulkDeleteSplittingEnabled(false)
@@ -76,7 +87,7 @@ public class App extends Application {
             shardManager.shutdown();
     }
 
-    public ShardManager getShardManager() {
+    public static ShardManager getShardManager() {
         return shardManager;
     }
 

@@ -10,3 +10,4 @@ gradle-app.setting
 .gradletasknamecache
 config
 TESTRUN
+application.properties

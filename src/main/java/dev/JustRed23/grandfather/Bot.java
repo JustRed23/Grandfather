@@ -6,6 +6,8 @@ import dev.JustRed23.stonebrick.cfg.Configurable;
 @Configurable
 public class Bot {
 
+    public static final long start_time = System.currentTimeMillis();
+
     @ConfigField(defaultValue = "false")
     public static boolean enabled;
 

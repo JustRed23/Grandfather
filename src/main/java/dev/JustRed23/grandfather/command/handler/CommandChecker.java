@@ -30,14 +30,18 @@ public class CommandChecker {
         if (command == null)
             return COMMAND_NOT_FOUND;
 
-        if (command instanceof DefaultInternalCommand && !isPrivateMessage)
+        if (command instanceof DefaultInternalCommand && !u.getId().equals(Bot.owner_id))
+            return COMMAND_NO_PERMISSION;
+        else if (command instanceof DefaultInternalCommand && u.getId().equals(Bot.owner_id))
+            return SUCCESS;
+
+        //If we want we could add some private channel only commands here
+
+        if (isPrivateMessage)
             return SUPPRESSED_FAIL;
 
         TextChannel channel = ((TextChannel) c);
         Member author = UserUtils.userToMember(channel.getGuild(), u);
-
-        if (command instanceof DefaultInternalCommand && !author.getId().equals(Bot.owner_id))
-            return COMMAND_NO_PERMISSION;
 
         if (command instanceof DefaultAdminCommand && !author.hasPermission(Permission.ADMINISTRATOR))
             return COMMAND_NO_PERMISSION;

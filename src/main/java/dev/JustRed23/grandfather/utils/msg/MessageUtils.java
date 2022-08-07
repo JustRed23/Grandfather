@@ -19,7 +19,7 @@ public class MessageUtils {
             case PRIVATE -> ((MessageReceivedEvent) event).getChannel().asPrivateChannel().sendMessage(text).queue();
             case GUILD -> ((MessageReceivedEvent) event).getChannel().asGuildMessageChannel().sendMessage(text).queue();
             case GUILD_SLASH -> ((SlashCommandInteractionEvent) event).deferReply().queue(response -> response.sendMessage(text).queue());
-            case UNKNOWN -> throw new IllegalArgumentException("Event type can only be PrivateMessageReceivedEvent, GuildMessageReceivedEvent or SlashCommandEvent");
+            case UNKNOWN -> throw new IllegalArgumentException("Event type can only be one of the following: PRIVATE, GUILD, GUILD_SLASH");
         }
     }
 }
