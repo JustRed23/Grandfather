@@ -53,3 +53,22 @@ dependencies {
     //Youtube Data API
     implementation 'com.google.apis:google-api-services-youtube:v3-rev20220719-1.32.1'
 }
+
+jar {
+    manifest {
+        attributes('Main-Class': 'dev.JustRed23.grandfather.App')
+        attributes('Implementation-Title': project.name, 'Implementation-Version': versioning.info.build)
+    }
+}
+
+task fatJar(type: Jar) {
+    manifest.from jar.manifest
+    classifier = 'all'
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "META-INF/**"
+        exclude "module-info.class"
+    }
+    with jar
+}
