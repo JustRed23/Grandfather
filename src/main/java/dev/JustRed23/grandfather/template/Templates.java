@@ -35,9 +35,12 @@ public class Templates {
                 no_matches = new Template("%s No matches found for `%s`", INFO),
                 not_playing = new Template("%s The player is not playing", WARNING),
                 already_paused = new Template("%s The player is already paused", INFO),
+                paused = new Template("%s The track has been paused", EmojiUtils.Music.PAUSE, INFO),
+                resumed = new Template("%s The track has been resumed", EmojiUtils.Music.PLAY, INFO),
                 song_playing = new Template("%s The player is currently playing a song or the queue is not empty", WARNING),
-                listen_moe_active = new Template("%s Listen.moe is currently active", WARNING),
                 no_previous_tracks = new Template("%s There are no previous tracks", ERROR),
+                next_track = new Template("%s Skipped", EmojiUtils.Music.NEXT_TRACK, INFO),
+                previous_track = new Template("%s Went back to the previous track", EmojiUtils.Music.PREV_TRACK, INFO),
                 empty_queue = new Template("%s The queue is empty", INFO);
     }
 

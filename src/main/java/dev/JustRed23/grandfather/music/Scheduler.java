@@ -46,12 +46,11 @@ public class Scheduler extends AudioEventAdapter {
     }
 
     public boolean prevTrack() {
-        AudioTrack playing = getPlayingTrack();
-
-        if (playing != null)
+        if (this.prev.isEmpty())
             return false;
 
         this.audioPlayer.startTrack(this.prev.poll(), false);
+        showTrackInfo(null);
         return true;
     }
 
@@ -66,6 +65,7 @@ public class Scheduler extends AudioEventAdapter {
             return;
         }
 
+        this.prev.add(audioPlayer.getPlayingTrack().makeClone());
         this.audioPlayer.startTrack(queue.poll(), false);
         showTrackInfo(null);
     }

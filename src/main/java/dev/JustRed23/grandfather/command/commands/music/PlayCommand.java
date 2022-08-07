@@ -71,7 +71,7 @@ public class PlayCommand extends DefaultMusicCommand {
 
         if (args.isEmpty() && manager.getScheduler().isPaused()) {
             manager.getScheduler().pause(true);
-            MessageUtils.sendMessage(EmojiUtils.Music.PLAY + " Resumed currently playing track.", event);
+            MessageUtils.sendTemplateMessage(Templates.music.resumed, event);
             return;
         }
 
