@@ -70,7 +70,7 @@ public class AudioPlayerManager {
                 boolean trackPlaying = musicManager.getScheduler().trackPlaying();
                 boolean isPaused = musicManager.getScheduler().isPaused();
 
-                track.setUserData(user.getAsTag());
+                track.setUserData(user);
 
                 AudioTrackInfo info = track.getInfo();
 
