@@ -2,14 +2,13 @@ package dev.JustRed23.grandfather.command;
 
 public enum Category {
     ADMIN,
-    GENERAL,
-    GAMES,
-    MODERATION,
-    UTILITY,
-    MUSIC,
     FUN,
+    GAMES,
+    GENERAL,
+    INTERNAL(false),
+    MUSIC,
     NSFW,
-    INTERNAL(false);
+    UTILITY;
 
     boolean show;
     Category(boolean show) {
