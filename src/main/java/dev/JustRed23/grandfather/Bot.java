@@ -12,6 +12,9 @@ public class Bot {
     @ConfigField(defaultValue = "true")
     public static boolean auto_update;
 
+    @ConfigField(defaultValue = "false")
+    public static boolean show_unknown_command_message;
+
     @ConfigField(defaultValue = "Grandfather")
     public static String name;
 

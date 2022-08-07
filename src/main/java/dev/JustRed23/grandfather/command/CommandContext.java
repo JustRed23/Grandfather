@@ -1,4 +1,4 @@
-package dev.JustRed23.grandfather.commands;
+package dev.JustRed23.grandfather.command;
 
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

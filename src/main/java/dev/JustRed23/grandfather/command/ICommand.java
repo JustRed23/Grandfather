@@ -1,4 +1,4 @@
-package dev.JustRed23.grandfather.commands;
+package dev.JustRed23.grandfather.command;
 
 import dev.JustRed23.grandfather.utils.Settings;
 import net.dv8tion.jda.api.Permission;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ICommand {
 
-    void run(CommandContext context);
+    void execute(CommandContext context);
 
     String getName();
     String getHelp();

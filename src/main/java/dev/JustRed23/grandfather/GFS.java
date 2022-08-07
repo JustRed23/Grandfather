@@ -22,6 +22,6 @@ public class GFS {
     @File(name = "data.db", directory = "data")
     public static dev.JustRed23.stonebrick.data.File dbFile;
 
-    @File(name = "log.txt", directory = "data/logs")
+    @File(name = "log.txt", directory = "logs")
     public static dev.JustRed23.stonebrick.data.File logFile;
 }

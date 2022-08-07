@@ -1,4 +1,4 @@
-package dev.JustRed23.grandfather.commands;
+package dev.JustRed23.grandfather.command;
 
 public enum Category {
     ADMIN,
