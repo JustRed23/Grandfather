@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public abstract class DefaultAdminCommand implements ICommand {
 
     public void execute(CommandContext context) {
+        if (context.isPrivateMessage())
+            return;
+
         if (context.getSlashCommandEvent() != null)
             execute(context, context.getSlashCommandEvent());
         else if (context.getMessageReceivedEvent() != null)

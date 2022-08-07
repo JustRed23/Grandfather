@@ -139,7 +139,7 @@ public final class CommandHandler {
         List<String> args = Arrays.asList(split).subList(1, split.length);
 
         CommandContext context = new CommandContext()
-                .setMessageReceivedEvent(event);
+                .setMessageReceivedEvent(event, privateMessage);
         context.setArgs(args);
 
         switch (CommandChecker.doChecks(command, event.getAuthor(), channel, privateMessage)) {

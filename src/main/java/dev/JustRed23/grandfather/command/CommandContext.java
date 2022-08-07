@@ -10,6 +10,7 @@ import java.util.List;
 public class CommandContext {
 
     private MessageReceivedEvent messageReceivedEvent;
+    private boolean privateMessage;
     private SlashCommandInteractionEvent slashCommandEvent;
 
     private List<String> args;
@@ -18,7 +19,8 @@ public class CommandContext {
         return messageReceivedEvent;
     }
 
-    public CommandContext setMessageReceivedEvent(MessageReceivedEvent messageReceivedEvent) {
+    public CommandContext setMessageReceivedEvent(MessageReceivedEvent messageReceivedEvent, boolean privateMessage) {
+        this.privateMessage = privateMessage;
         this.messageReceivedEvent = messageReceivedEvent;
         return this;
     }
@@ -39,6 +41,10 @@ public class CommandContext {
         else if (getSlashCommandEvent() != null)
             return getSlashCommandEvent();
         return null;
+    }
+
+    public boolean isPrivateMessage() {
+        return privateMessage;
     }
 
     public List<String> getArgs() {
