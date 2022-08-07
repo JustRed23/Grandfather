@@ -1,6 +1,5 @@
 package dev.JustRed23.grandfather.utils.msg;
 
-import io.r2dbc.spi.Result;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

@@ -1,6 +1,6 @@
 package dev.JustRed23.grandfather.template;
 
-import dev.JustRed23.Grandfather.utils.EmojiUtils;
+import dev.JustRed23.grandfather.utils.EmojiUtils;
 
 public enum TemplateTypes {
     INFO(EmojiUtils.General.INFO), WARNING(EmojiUtils.General.WARNING), ERROR(EmojiUtils.General.ERROR);

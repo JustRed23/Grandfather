@@ -1,8 +1,8 @@
 package dev.JustRed23.grandfather.template;
 
-import dev.JustRed23.Grandfather.utils.EmojiUtils;
+import dev.JustRed23.grandfather.utils.EmojiUtils;
 
-import static dev.JustRed23.Grandfather.template.TemplateTypes.*;
+import static dev.JustRed23.grandfather.template.TemplateTypes.*;
 
 public class Templates {
 
