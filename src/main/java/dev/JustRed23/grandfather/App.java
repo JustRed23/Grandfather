@@ -51,7 +51,7 @@ public class App extends Application {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setActivity(Activity.listening("to 1970's hits"));
+                .setActivity(Activity.listening("1970's hits"));
 
         getServicePool().addService(InactivityService.class);
     }
