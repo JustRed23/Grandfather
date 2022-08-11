@@ -37,6 +37,7 @@ public class Templates {
                 already_paused = new Template("%s The player is already paused", INFO),
                 paused = new Template("%s The track has been paused", EmojiUtils.Music.PAUSE, INFO),
                 resumed = new Template("%s The track has been resumed", EmojiUtils.Music.PLAY, INFO),
+                restart = new Template("%s Replaying track", EmojiUtils.Music.REPEAT, INFO),
                 song_playing = new Template("%s The player is currently playing a song or the queue is not empty", WARNING),
                 no_previous_tracks = new Template("%s There are no previous tracks", ERROR),
                 next_track = new Template("%s Skipped", EmojiUtils.Music.NEXT_TRACK, INFO),

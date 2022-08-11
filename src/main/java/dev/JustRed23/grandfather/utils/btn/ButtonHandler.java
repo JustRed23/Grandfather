@@ -23,8 +23,10 @@ public class ButtonHandler {
     }
 
     protected synchronized void addButton(@NotNull String buttonId, @Nullable List<User> allowedUsers, @NotNull Consumer<ButtonInteractionEvent> onTrigger, @NotNull Consumer<ButtonInteractionEvent> onComplete) {
-        if (buttons.containsKey(buttonId) || users.containsKey(buttonId))
+        if (buttons.containsKey(buttonId) || users.containsKey(buttonId)) {
+            System.err.println("Button with ID " + buttonId + " already exists!");
             return;
+        }
 
         users.put(buttonId, allowedUsers == null ? Collections.emptyList() : allowedUsers);
         buttons.put(buttonId, Pair.of(onTrigger, onComplete));
@@ -65,9 +67,11 @@ public class ButtonHandler {
         }
     }
 
-    private void removeButton(String buttonId) {
-        buttons.remove(buttonId);
-        users.remove(buttonId);
+    public void removeButton(String buttonId) {
+        if (buttons.containsKey(buttonId)) {
+            buttons.remove(buttonId);
+            users.remove(buttonId);
+        }
     }
 
     private boolean canHandle(String buttonId) {

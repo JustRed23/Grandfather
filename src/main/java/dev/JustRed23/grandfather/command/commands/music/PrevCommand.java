@@ -40,7 +40,7 @@ public class PrevCommand extends DefaultMusicCommand {
     }
 
     public CommandData getCommandData() {
-        return Commands.slash(getName(), getHelp());
+        return Commands.slash(getName(), getHelp()).setGuildOnly(true);
     }
 
     public boolean needConnectedVoice() {

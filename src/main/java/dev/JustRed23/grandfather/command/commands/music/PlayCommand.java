@@ -3,6 +3,7 @@ package dev.JustRed23.grandfather.command.commands.music;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.VideoContentDetails;
 import dev.JustRed23.grandfather.command.CommandContext;
+import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.command.types.DefaultMusicCommand;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
@@ -25,6 +26,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
 import java.awt.*;
 import java.io.IOException;
@@ -59,7 +61,7 @@ public class PlayCommand extends DefaultMusicCommand {
         }
 
         if (!botState.inAudioChannel()) {
-            JoinCommand.join(author, bot, channel, context, false);
+            JoinCommand.join(event, channel, author, bot);
             playSong(args, channel, author.getUser(), event);
             return;
         }
@@ -70,7 +72,7 @@ public class PlayCommand extends DefaultMusicCommand {
         }
 
         if (args.isEmpty() && manager.getScheduler().isPaused()) {
-            manager.getScheduler().pause(true);
+            manager.resume();
             MessageUtils.sendTemplateMessage(Templates.music.resumed, event);
             return;
         }
@@ -105,7 +107,7 @@ public class PlayCommand extends DefaultMusicCommand {
         }
 
         if (!botState.inAudioChannel()) {
-            JoinCommand.join(author, bot, channel, context, true);
+            JoinCommand.join(event, channel, author, bot);
             playSong(Collections.singletonList(query), channel, author.getUser(), event);
             return;
         }
@@ -116,7 +118,7 @@ public class PlayCommand extends DefaultMusicCommand {
         }
 
         if (query.isEmpty() && manager.getScheduler().isPaused()) {
-            manager.getScheduler().pause(true);
+            manager.resume();
             MessageUtils.sendMessage(EmojiUtils.Music.PLAY + " Resumed currently playing track.", event);
             return;
         }
@@ -162,7 +164,7 @@ public class PlayCommand extends DefaultMusicCommand {
             stringBuilder.append("`#")
                     .append(i + 1)
                     .append(".` ")
-                    .append(result.getSnippet().getTitle())
+                    .append(MarkdownSanitizer.escape(result.getSnippet().getTitle(), true))
                     .append("\n")
                     .append("**(")
                     .append(TimeUtils.youtubeTime(durations.get(i).getDuration()))
@@ -179,6 +181,8 @@ public class PlayCommand extends DefaultMusicCommand {
             buttons.add(new BetterButton().primary("grandfather:play:option-" + i, String.valueOf(i)).onEvent(
                     channel.getGuild(), user, unused -> {},
                     e -> {
+                        for (int j = 1; j <= searched.size(); j++)
+                            CommandHandler.getButtonHandler(channel.getGuild()).removeButton("grandfather:play:option-" + j);
                         e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue());
                         AudioPlayerManager.getInstance().loadAndPlay(channel, user, YoutubeUtils.getVideo(searched.get(finalI - 1).getId().getVideoId()));
                     }

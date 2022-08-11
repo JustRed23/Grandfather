@@ -13,34 +13,28 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class PauseCommand extends DefaultMusicCommand {
+public class ReplayCommand extends DefaultMusicCommand {
 
     public void execute(CommandContext context, MessageReceivedEvent event) {
-        pause(event.getGuild(), event);
+        replay(event.getGuild(), event);
     }
 
     public void execute(CommandContext context, SlashCommandInteractionEvent event) {
-        pause(event.getGuild(), event);
+        replay(event.getGuild(), event);
     }
 
-    private void pause(Guild guild, Event event) {
+    private void replay(Guild guild, Event event) {
         MusicManager manager = AudioPlayerManager.getInstance().getMusicManager(guild);
-
-        if (manager.getScheduler().isPaused()) {
-            MessageUtils.sendTemplateMessage(Templates.music.already_paused, event);
-            return;
-        }
-
-        manager.pause();
-        MessageUtils.sendTemplateMessage(Templates.music.paused, event);
+        manager.restart();
+        MessageUtils.sendTemplateMessage(Templates.music.restart, event);
     }
 
     public String getName() {
-        return "pause";
+        return "replay";
     }
 
     public String getHelp() {
-        return "Pauses the current song";
+        return "Replays the current song";
     }
 
     public CommandData getCommandData() {

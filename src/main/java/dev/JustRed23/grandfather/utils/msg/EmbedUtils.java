@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.internal.utils.Checks;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
@@ -38,12 +39,19 @@ public class EmbedUtils {
         }
     }
 
+    public static void sendTemplateEmbed(@NotNull Template template, @Nullable Event event, @NotNull TextChannel channel) {
+        if (event != null)
+            sendTemplateEmbed(template, event);
+        else
+            sendTemplateEmbed(template, channel);
+    }
+
     public static void sendInfoEmbed(@NotNull CharSequence message, net.dv8tion.jda.api.events.Event event) {
         sendEmbed(new EmbedBuilder().setColor(INFO).setDescription(message), event);
     }
 
     public static void sendInfoEmbed(@NotNull CharSequence message, @NotNull TextChannel channel) {
-        channel.sendMessageEmbeds(new EmbedBuilder().setColor(INFO).setDescription(message).build()).queue();
+        sendEmbed(new EmbedBuilder().setColor(INFO).setDescription(message), channel);
     }
 
     public static void sendWarningEmbed(@NotNull CharSequence message, net.dv8tion.jda.api.events.Event event) {
@@ -51,7 +59,7 @@ public class EmbedUtils {
     }
 
     public static void sendWarningEmbed(@NotNull CharSequence message, @NotNull TextChannel channel) {
-        channel.sendMessageEmbeds(new EmbedBuilder().setColor(WARNING).setDescription(message).build()).queue();
+        sendEmbed(new EmbedBuilder().setColor(WARNING).setDescription(message), channel);
     }
 
     public static void sendErrorEmbed(@NotNull CharSequence message, net.dv8tion.jda.api.events.Event event) {
@@ -59,7 +67,7 @@ public class EmbedUtils {
     }
 
     public static void sendErrorEmbed(@NotNull CharSequence message, @NotNull TextChannel channel) {
-        channel.sendMessageEmbeds(new EmbedBuilder().setColor(ERROR).setDescription(message).build()).queue();
+        sendEmbed(new EmbedBuilder().setColor(ERROR).setDescription(message), channel);
     }
 
     public static void sendEmbed(EmbedBuilder embedBuilder, net.dv8tion.jda.api.events.Event event) {
@@ -69,6 +77,17 @@ public class EmbedUtils {
             case GUILD_SLASH -> ((SlashCommandInteractionEvent) event).deferReply().queue(response -> response.sendMessageEmbeds(embedBuilder.build()).queue());
             case UNKNOWN -> throw new IllegalArgumentException("Event type can only be one of the following: PRIVATE, GUILD, GUILD_SLASH");
         }
+    }
+
+    public static void sendEmbed(EmbedBuilder embedBuilder, @NotNull TextChannel channel) {
+        channel.sendMessageEmbeds(embedBuilder.build()).queue();
+    }
+
+    public static void sendEmbed(EmbedBuilder embedBuilder, @Nullable net.dv8tion.jda.api.events.Event event, @NotNull TextChannel channel) {
+        if (event != null)
+            sendEmbed(embedBuilder, event);
+        else
+            sendEmbed(embedBuilder, channel);
     }
 
     public static void sendEmbedWithActionRows(EmbedBuilder embedBuilder, Event event, ActionRow... actionRows) {

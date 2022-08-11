@@ -69,6 +69,7 @@ public class ReactionHandler {
             if (listener.getUser() == null || listener.getUser().getIdLong() == userId)
                 listener.react(reaction.getEmoji().getName(), message);
         }
+        cleanCache();
     }
 
     /**

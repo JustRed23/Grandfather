@@ -137,6 +137,7 @@ public class AudioPlayerManager {
 
     public void shutdown() {
         this.musicManagers.forEach((aLong, musicManager) -> musicManager.getScheduler().disconnect());
+        this.musicManagers.clear();
     }
 
     public Map<Long, Long> getLastActive() {

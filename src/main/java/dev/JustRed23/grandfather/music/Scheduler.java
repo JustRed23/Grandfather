@@ -106,7 +106,7 @@ public class Scheduler extends AudioEventAdapter {
         MusicManager musicManager = AudioPlayerManager.getInstance().getMusicManager(guild);
 
         if (!trackPlaying()) {
-            EmbedUtils.sendTemplateEmbed(Templates.music.not_playing, event);
+            EmbedUtils.sendTemplateEmbed(Templates.music.not_playing, event, channel);
             return;
         }
 
@@ -119,10 +119,7 @@ public class Scheduler extends AudioEventAdapter {
         else
             builder = MusicUtils.displayMusicInfo(musicManager);
 
-        if (event != null)
-            EmbedUtils.sendEmbed(builder, event);
-        else
-            this.channel.sendMessageEmbeds(builder.build()).queue();
+        EmbedUtils.sendEmbed(builder, event, channel);
     }
 
 
@@ -144,8 +141,12 @@ public class Scheduler extends AudioEventAdapter {
             else
                 this.prev.add(track.makeClone());
 
-            audioPlayer.startTrack(this.queue.poll(), false);
+            AudioTrack poll = this.queue.poll();
+            audioPlayer.startTrack(poll, false);
+            if (poll != null)
+                showTrackInfo(null);
         }
+        AudioPlayerManager.getInstance().getLastActive().put(guild.getIdLong(), System.currentTimeMillis());
     }
 
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
@@ -183,6 +184,11 @@ public class Scheduler extends AudioEventAdapter {
 
     public boolean isPaused() {
         return this.audioPlayer.isPaused();
+    }
+
+    public boolean toggleLoop() {
+        this.trackMode = trackLooping() ? TrackModes.NORMAL : TrackModes.LOOPING;
+        return trackLooping();
     }
 
     public boolean trackLooping() {

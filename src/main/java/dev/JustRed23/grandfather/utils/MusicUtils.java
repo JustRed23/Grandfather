@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.JustRed23.grandfather.music.MusicManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
@@ -23,7 +24,7 @@ public class MusicUtils {
         builder.setThumbnail(YoutubeUtils.getThumbnail(YoutubeUtils.getVideoID(info.uri)));
         builder.setFooter("Requested by " + track.getUserData(User.class).getAsTag(), track.getUserData(User.class).getEffectiveAvatarUrl());
 
-        builder.setTitle(info.title, info.uri);
+        builder.setTitle(MarkdownSanitizer.escape(info.title, true), info.uri);
 
         return builder;
     }
@@ -42,7 +43,7 @@ public class MusicUtils {
 
         String uriWithTimestamp = info.uri + "&t=" + timeStamp;
 
-        builder.setTitle(info.title, uriWithTimestamp);
+        builder.setTitle(MarkdownSanitizer.escape(info.title, true), uriWithTimestamp);
 
         StringBuilder stringBuilder = new StringBuilder();
 

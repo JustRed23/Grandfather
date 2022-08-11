@@ -2,6 +2,7 @@ package dev.JustRed23.grandfather;
 
 import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.event.BasicEventListener;
+import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.services.InactivityService;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
@@ -74,8 +75,10 @@ public class App extends Application {
     }
 
     protected void stop() throws Exception {
-        if (shardManager != null)
-            shardManager.shutdown();
+        if (shardManager == null)
+            return;
+        AudioPlayerManager.getInstance().shutdown();
+        shardManager.shutdown();
     }
 
     public static ShardManager getShardManager() {

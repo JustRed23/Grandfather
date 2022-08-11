@@ -35,22 +35,21 @@ public class InactivityService extends Service {
         getConnectedVoiceChannels().forEach(channel -> {
             MusicManager musicManager = AudioPlayerManager.getInstance().getMusicManager(channel.getGuild());
 
-            if (channel.getMembers().stream().anyMatch(member ->
-                    !musicManager.getScheduler().getQueue().isEmpty()
-                            && !musicManager.getScheduler().isPaused())) {
-                AudioPlayerManager.getInstance().getLastActive().remove(channel.getGuild().getIdLong());
-                return;
-            }
-
             if (!isMemberPresent(channel)) {
                 if (!botAlone.containsKey(channel)) {
                     botAlone.put(channel, System.currentTimeMillis());
+                    return;
                 } else if (System.currentTimeMillis() >= botAlone.get(channel) + TIME_UNTIL_DISCONNECT) {
                     musicManager.getScheduler().disconnect();
                     botAlone.remove(channel);
                     return;
                 }
             } else botAlone.remove(channel);
+
+            if (musicManager.getScheduler().trackPlaying() && !musicManager.getScheduler().isPaused()) {
+                AudioPlayerManager.getInstance().getLastActive().remove(channel.getGuild().getIdLong());
+                return;
+            }
 
             if (AudioPlayerManager.getInstance().getLastActive().containsKey(channel.getGuild().getIdLong())
                     && System.currentTimeMillis() >= AudioPlayerManager.getInstance().getLastActive().get(channel.getGuild().getIdLong()) + TIME_UNTIL_DISCONNECT) {
@@ -84,7 +83,7 @@ public class InactivityService extends Service {
     private Set<AudioChannel> getConnectedVoiceChannels() {
         Set<AudioChannel> channels = new HashSet<>();
 
-        for (JDA shard : ((App) application).getShardManager().getShards()) {
+        for (JDA shard : App.getShardManager().getShards()) {
             channels.addAll(shard.getGuilds().stream()
                     .filter(g -> g.getAudioManager().getConnectedChannel() != null)
                     .map(g -> g.getAudioManager().getConnectedChannel())

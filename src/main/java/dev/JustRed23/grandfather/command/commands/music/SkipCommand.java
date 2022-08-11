@@ -41,7 +41,7 @@ public class SkipCommand extends DefaultMusicCommand {
     }
 
     public CommandData getCommandData() {
-        return Commands.slash(getName(), getHelp());
+        return Commands.slash(getName(), getHelp()).setGuildOnly(true);
     }
 
     public List<String> getAliases() {

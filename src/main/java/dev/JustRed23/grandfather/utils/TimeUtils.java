@@ -7,11 +7,11 @@ public class TimeUtils {
 
     private TimeUtils() {}
 
-    public static String millisToTime(long ms) {
-        int days = (int) (ms / (60 * 60 * 24 * 1000));
-        int hours = (int) (ms / (60 * 60 * 1000));
-        int minutes = (int) (ms / (60 * 1000)) % 60;
-        int seconds = (int) (ms / 1000) % 60;
+    public static String millisToTime(long millis) {
+        long days = TimeUnit.MILLISECONDS.toDays(millis);
+        long hours = TimeUnit.MILLISECONDS.toHours(millis) - TimeUnit.DAYS.toHours(TimeUnit.MILLISECONDS.toDays(millis));
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis));
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis));
 
         String time = "";
 

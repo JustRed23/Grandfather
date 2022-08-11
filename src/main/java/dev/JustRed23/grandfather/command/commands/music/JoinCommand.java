@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -22,20 +23,20 @@ import java.util.List;
 public class JoinCommand extends DefaultMusicCommand {
 
     public void execute(CommandContext context, MessageReceivedEvent event) {
-        join(event.getMember(), event.getGuild().getSelfMember(), event.getChannel().asTextChannel(), context, false);
+        join(event, event.getChannel().asTextChannel(), event.getMember(), event.getGuild().getSelfMember());
     }
 
     public void execute(CommandContext context, SlashCommandInteractionEvent event) {
-        join(event.getMember(), event.getGuild().getSelfMember(), event.getChannel().asTextChannel(), context, false);
+        join(event, event.getChannel().asTextChannel(), event.getMember(), event.getGuild().getSelfMember());
     }
 
-    public static void join(Member user, Member bot, TextChannel channel, CommandContext context, boolean slashCommand) {
+    public static void join(Event event, TextChannel channel, Member user, Member bot) {
         Guild guild = channel.getGuild();
         GuildVoiceState userVoiceState = user.getVoiceState();
         GuildVoiceState botVoiceState = bot.getVoiceState();
 
         if (botVoiceState.inAudioChannel()) {
-            MessageUtils.sendTemplateMessage(Templates.music.already_in_channel, context.getEvent());
+            MessageUtils.sendTemplateMessage(Templates.music.already_in_channel, event);
             return;
         }
 
@@ -44,10 +45,7 @@ public class JoinCommand extends DefaultMusicCommand {
         MusicManager musicManager = AudioPlayerManager.getInstance().getMusicManager(guild);
         musicManager.getScheduler().setChannel(channel);
 
-        if (!slashCommand)
-            MessageUtils.sendMessage(Templates.music.joined.format(userVoiceState.getChannel().getName(), channel), context.getEvent());
-        else
-            channel.sendMessage(Templates.music.joined.format(userVoiceState.getChannel().getName(), channel)).queue();
+        MessageUtils.sendMessage(Templates.music.joined.format(userVoiceState.getChannel().getName(), channel), event);
     }
 
     public String getName() {
