@@ -2,12 +2,12 @@ package dev.JustRed23.grandfather.command.commands.music;
 
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.VideoContentDetails;
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.command.types.DefaultMusicCommand;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
-import dev.JustRed23.grandfather.template.Templates;
 import dev.JustRed23.grandfather.utils.EmojiUtils;
 import dev.JustRed23.grandfather.utils.HttpUtils;
 import dev.JustRed23.grandfather.utils.TimeUtils;
@@ -51,12 +51,12 @@ public class PlayCommand extends DefaultMusicCommand {
         manager.getScheduler().setChannel(channel);
 
         if (args.isEmpty() && !manager.getScheduler().isPaused()) {
-            EmbedUtils.sendTemplateEmbed(Templates.music.no_link, event);
+            Templates.Music.no_link.embed(event);
             return;
         }
 
         if (!memberState.inAudioChannel()) {
-            EmbedUtils.sendTemplateEmbed(Templates.music.user_not_connected, event);
+            Templates.Music.user_not_connected.embed(event);
             return;
         }
 
@@ -67,13 +67,13 @@ public class PlayCommand extends DefaultMusicCommand {
         }
 
         if (!memberState.getChannel().equals(botState.getChannel())) {
-            EmbedUtils.sendTemplateEmbed(Templates.music.in_different_channel, event);
+            Templates.Music.in_different_channel.embed(event);
             return;
         }
 
         if (args.isEmpty() && manager.getScheduler().isPaused()) {
             manager.resume();
-            MessageUtils.sendTemplateMessage(Templates.music.resumed, event);
+            Templates.Music.resumed.message(event);
             return;
         }
 
@@ -97,12 +97,12 @@ public class PlayCommand extends DefaultMusicCommand {
         manager.getScheduler().setChannel(channel);
 
         if (query.isEmpty() && !manager.getScheduler().isPaused()) {
-            EmbedUtils.sendTemplateEmbed(Templates.music.no_link, event);
+            Templates.Music.no_link.embed(event);
             return;
         }
 
         if (!memberState.inAudioChannel()) {
-            EmbedUtils.sendTemplateEmbed(Templates.music.user_not_connected, event);
+            Templates.Music.user_not_connected.embed(event);
             return;
         }
 
@@ -113,13 +113,13 @@ public class PlayCommand extends DefaultMusicCommand {
         }
 
         if (!memberState.getChannel().equals(botState.getChannel())) {
-            EmbedUtils.sendTemplateEmbed(Templates.music.in_different_channel, event);
+            Templates.Music.in_different_channel.embed(event);
             return;
         }
 
         if (query.isEmpty() && manager.getScheduler().isPaused()) {
             manager.resume();
-            MessageUtils.sendMessage(EmojiUtils.Music.PLAY + " Resumed currently playing track.", event);
+            Templates.Music.resumed.message(event);
             return;
         }
 

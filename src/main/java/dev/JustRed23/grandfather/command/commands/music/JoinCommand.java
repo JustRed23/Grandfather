@@ -1,11 +1,10 @@
 package dev.JustRed23.grandfather.command.commands.music;
 
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultMusicCommand;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
-import dev.JustRed23.grandfather.template.Templates;
-import dev.JustRed23.grandfather.utils.msg.MessageUtils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -36,7 +35,7 @@ public class JoinCommand extends DefaultMusicCommand {
         GuildVoiceState botVoiceState = bot.getVoiceState();
 
         if (botVoiceState.inAudioChannel()) {
-            MessageUtils.sendTemplateMessage(Templates.music.already_in_channel, event);
+            Templates.Music.already_in_channel.message(event);
             return;
         }
 
@@ -45,7 +44,7 @@ public class JoinCommand extends DefaultMusicCommand {
         MusicManager musicManager = AudioPlayerManager.getInstance().getMusicManager(guild);
         musicManager.getScheduler().setChannel(channel);
 
-        MessageUtils.sendMessage(Templates.music.joined.format(userVoiceState.getChannel().getName(), channel), event);
+        Templates.Music.joined.format(userVoiceState.getChannel().getName(), channel).message(event);
     }
 
     public String getName() {

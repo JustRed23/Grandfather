@@ -1,11 +1,11 @@
 package dev.JustRed23.grandfather.command.commands.general;
 
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.Category;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.ICommand;
 import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.command.types.DefaultGuildCommand;
-import dev.JustRed23.grandfather.template.Templates;
 import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -78,7 +78,7 @@ public class HelpCommand extends DefaultGuildCommand {
         ICommand command = CommandHandler.getCommand(searchTerm);
 
         if (command == null) {
-            EmbedUtils.sendErrorEmbed(Templates.help.no_command_or_category.format(searchTerm), event);
+            Templates.Help.no_command_or_category.format(searchTerm).embed(event);
             return;
         }
 
@@ -122,7 +122,7 @@ public class HelpCommand extends DefaultGuildCommand {
                 ICommand command = CommandHandler.getCommand(search);
 
                 if (command == null) {
-                    EmbedUtils.sendErrorEmbed(Templates.help.no_command.format(search), event);
+                    Templates.Help.no_command.format(search).embed(event);
                     return;
                 }
 

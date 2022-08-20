@@ -1,11 +1,10 @@
 package dev.JustRed23.grandfather.command.commands.music;
 
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultMusicCommand;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
-import dev.JustRed23.grandfather.template.Templates;
-import dev.JustRed23.grandfather.utils.msg.MessageUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -28,7 +27,7 @@ public class DisconnectCommand extends DefaultMusicCommand {
         MusicManager musicManager = AudioPlayerManager.getInstance().getMusicManager(guild);
         musicManager.getScheduler().disconnect();
 
-        MessageUtils.sendTemplateMessage(Templates.music.disconnected, context.getEvent());
+        Templates.Music.disconnected.message(context.getEvent());
     }
 
     public String getName() {

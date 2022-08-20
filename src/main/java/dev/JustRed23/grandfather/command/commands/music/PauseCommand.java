@@ -1,11 +1,10 @@
 package dev.JustRed23.grandfather.command.commands.music;
 
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultMusicCommand;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
-import dev.JustRed23.grandfather.template.Templates;
-import dev.JustRed23.grandfather.utils.msg.MessageUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,12 +26,12 @@ public class PauseCommand extends DefaultMusicCommand {
         MusicManager manager = AudioPlayerManager.getInstance().getMusicManager(guild);
 
         if (manager.getScheduler().isPaused()) {
-            MessageUtils.sendTemplateMessage(Templates.music.already_paused, event);
+            Templates.Music.already_paused.message(event);
             return;
         }
 
         manager.pause();
-        MessageUtils.sendTemplateMessage(Templates.music.paused, event);
+        Templates.Music.paused.message(event);
     }
 
     public String getName() {

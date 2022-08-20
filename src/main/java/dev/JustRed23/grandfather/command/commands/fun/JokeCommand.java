@@ -1,5 +1,8 @@
 package dev.JustRed23.grandfather.command.commands.fun;
 
+import dev.JustRed23.grandfather.bettertemplate.FormattedTemplate;
+import dev.JustRed23.grandfather.bettertemplate.TemplateType;
+import dev.JustRed23.grandfather.bettertemplate.UnformattedTemplate;
 import dev.JustRed23.grandfather.command.Category;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultGuildCommand;
@@ -19,7 +22,7 @@ public class JokeCommand extends DefaultGuildCommand {
         NetworkManager.get("https://icanhazdadjoke.com/").header("Accept", "application/json").async(new Callback() {
             public void response(Request request, Response response, NetRequestException e) {
                 if (e != null || !response.isSuccess()) {
-                    EmbedUtils.sendErrorEmbed("An unexpected error occurred: " + response.responseCode(), context.getEvent());
+                    FormattedTemplate.from("An unexpected error occurred: " + response.responseCode(), TemplateType.ERROR).embed(context.getEvent());
                     return;
                 }
                 MessageUtils.sendMessage(response.asJSONObject().getString("joke"), context.getEvent());

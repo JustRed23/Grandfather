@@ -5,7 +5,7 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import dev.JustRed23.grandfather.template.Templates;
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.utils.MusicUtils;
 import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -106,7 +106,7 @@ public class Scheduler extends AudioEventAdapter {
         MusicManager musicManager = AudioPlayerManager.getInstance().getMusicManager(guild);
 
         if (!trackPlaying()) {
-            EmbedUtils.sendTemplateEmbed(Templates.music.not_playing, event, channel);
+            Templates.Music.not_playing.embed(channel);
             return;
         }
 

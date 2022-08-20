@@ -1,11 +1,10 @@
 package dev.JustRed23.grandfather.command.commands.music;
 
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultMusicCommand;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
-import dev.JustRed23.grandfather.template.Templates;
-import dev.JustRed23.grandfather.utils.msg.MessageUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -29,7 +28,7 @@ public class SkipCommand extends DefaultMusicCommand {
     private void skip(Guild guild, Event event) {
         MusicManager manager = AudioPlayerManager.getInstance().getMusicManager(guild);
         manager.nextTrack();
-        MessageUtils.sendTemplateMessage(Templates.music.next_track, event);
+        Templates.Music.next_track.message(event);
     }
 
     public String getName() {

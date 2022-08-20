@@ -1,10 +1,10 @@
 package dev.JustRed23.grandfather.command.handler;
 
 import dev.JustRed23.grandfather.Bot;
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.Category;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.ICommand;
-import dev.JustRed23.grandfather.template.Templates;
 import dev.JustRed23.grandfather.utils.Settings;
 import dev.JustRed23.grandfather.utils.btn.ButtonHandler;
 import dev.JustRed23.grandfather.utils.msg.ReactionHandler;
@@ -28,9 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
-
-import static dev.JustRed23.grandfather.utils.msg.EmbedUtils.sendErrorEmbed;
-import static dev.JustRed23.grandfather.utils.msg.EmbedUtils.sendTemplateEmbed;
 
 public final class CommandHandler {
 
@@ -89,24 +86,22 @@ public final class CommandHandler {
         if (command == null || event.getGuild() == null || !event.getChannel().canTalk())
             return;
 
-        String prefix = Settings.getPrefix(event.getGuild());
-
         CommandContext context = new CommandContext()
                 .setSlashCommandEvent(event);
 
         switch (CommandChecker.doChecks(command, event.getUser(), event.getChannel(), false)) {
             case COMMAND_NOT_FOUND -> {
                 if (Bot.show_unknown_command_message)
-                    sendErrorEmbed(Templates.command_not_found.format(prefix), event);
+                    Templates.command_not_found.format(Settings.getPrefix(event.getGuild())).embed(event);
             }
-            case COMMAND_NO_PERMISSION -> sendTemplateEmbed(Templates.command_no_permission, event);
-            case BOT_NO_PERMISSION -> sendTemplateEmbed(Templates.bot_no_permission, event);
-            case CANNOT_DETECT_STATE -> sendTemplateEmbed(Templates.music.cannot_detect_state, event);
-            case USER_NOT_CONNECTED -> sendTemplateEmbed(Templates.music.user_not_connected, event);
-            case BOT_NOT_CONNECTED -> sendTemplateEmbed(Templates.music.bot_not_connected, event);
-            case IN_DIFFERENT_CHANNEL -> sendTemplateEmbed(Templates.music.in_different_channel, event);
-            case NOT_PLAYING -> sendTemplateEmbed(Templates.music.not_playing, event);
-            case EMPTY_QUEUE -> sendTemplateEmbed(Templates.music.empty_queue, event);
+            case COMMAND_NO_PERMISSION -> Templates.command_no_permission.embed(event);
+            case BOT_NO_PERMISSION -> Templates.bot_no_permission.embed(event);
+            case CANNOT_DETECT_STATE -> Templates.Music.cannot_detect_state.embed(event);
+            case USER_NOT_CONNECTED -> Templates.Music.user_not_connected.embed(event);
+            case BOT_NOT_CONNECTED -> Templates.Music.bot_not_connected.embed(event);
+            case IN_DIFFERENT_CHANNEL -> Templates.Music.in_different_channel.embed(event);
+            case NOT_PLAYING -> Templates.Music.not_playing.embed(event);
+            case EMPTY_QUEUE -> Templates.Music.empty_queue.embed(event);
             case SUCCESS -> command.execute(context);
         }
     }
@@ -125,6 +120,9 @@ public final class CommandHandler {
             message = message.replace(mentionMeAlias, "").trim();
             startedWithMention = true;
         }
+
+        if (!startedWithMention && !message.startsWith(prefix))
+            return;
 
         if (!channel.canTalk())
             return;
@@ -145,16 +143,16 @@ public final class CommandHandler {
         switch (CommandChecker.doChecks(command, event.getAuthor(), channel, privateMessage)) {
             case COMMAND_NOT_FOUND -> {
                 if (Bot.show_unknown_command_message)
-                    sendErrorEmbed(Templates.command_not_found.format(prefix), event);
+                    Templates.command_not_found.format(prefix).embed(event);
             }
-            case COMMAND_NO_PERMISSION -> sendTemplateEmbed(Templates.command_no_permission, event);
-            case BOT_NO_PERMISSION -> sendTemplateEmbed(Templates.bot_no_permission, event);
-            case CANNOT_DETECT_STATE -> sendTemplateEmbed(Templates.music.cannot_detect_state, event);
-            case USER_NOT_CONNECTED -> sendTemplateEmbed(Templates.music.user_not_connected, event);
-            case BOT_NOT_CONNECTED -> sendTemplateEmbed(Templates.music.bot_not_connected, event);
-            case IN_DIFFERENT_CHANNEL -> sendTemplateEmbed(Templates.music.in_different_channel, event);
-            case NOT_PLAYING -> sendTemplateEmbed(Templates.music.not_playing, event);
-            case EMPTY_QUEUE -> sendTemplateEmbed(Templates.music.empty_queue, event);
+            case COMMAND_NO_PERMISSION -> Templates.command_no_permission.embed(event);
+            case BOT_NO_PERMISSION -> Templates.bot_no_permission.embed(event);
+            case CANNOT_DETECT_STATE -> Templates.Music.cannot_detect_state.embed(event);
+            case USER_NOT_CONNECTED -> Templates.Music.user_not_connected.embed(event);
+            case BOT_NOT_CONNECTED -> Templates.Music.bot_not_connected.embed(event);
+            case IN_DIFFERENT_CHANNEL -> Templates.Music.in_different_channel.embed(event);
+            case NOT_PLAYING -> Templates.Music.not_playing.embed(event);
+            case EMPTY_QUEUE -> Templates.Music.empty_queue.embed(event);
             case SUCCESS -> {
                 event.getChannel().sendTyping().queue();
                 assert command != null;

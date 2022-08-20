@@ -1,18 +1,12 @@
 package dev.JustRed23.grandfather.utils.msg;
 
-import dev.JustRed23.grandfather.template.Template;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.jetbrains.annotations.NotNull;
 
 public class MessageUtils {
 
     private MessageUtils() {}
-
-    public static void sendTemplateMessage(@NotNull Template template, Event event) {
-        sendMessage(template.toString(), event);
-    }
 
     public static void sendMessage(String text, Event event) {
         switch (EventType.getEventType(event)) {

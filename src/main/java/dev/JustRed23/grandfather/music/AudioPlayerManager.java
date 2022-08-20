@@ -7,7 +7,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import dev.JustRed23.grandfather.template.Templates;
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.grandfather.utils.YoutubeUtils;
 import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
@@ -120,7 +120,7 @@ public class AudioPlayerManager {
             }
 
             public void noMatches() {
-                EmbedUtils.sendInfoEmbed(Templates.music.no_matches.format(url), channel);
+                Templates.Music.no_matches.format(url).embed(channel);
             }
 
             public void loadFailed(FriendlyException exception) {

@@ -1,8 +1,8 @@
 package dev.JustRed23.grandfather.command.commands.admin;
 
+import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultAdminCommand;
-import dev.JustRed23.grandfather.template.Templates;
 import dev.JustRed23.grandfather.utils.UserUtils;
 import dev.JustRed23.grandfather.utils.btn.BetterButton;
 import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
@@ -34,26 +34,26 @@ public class KickCommand extends DefaultAdminCommand {
         final List<String> args = context.getArgs();
 
         if (args.isEmpty()) {
-            EmbedUtils.sendWarningEmbed(Templates.kick.mention_a_member, event);
+            Templates.Kick.mention_a_member.embed(event);
             return;
         }
 
         Member member = UserUtils.getMemberFromMention(args.get(0), guild, event.getJDA());
 
         if (member == null) {
-            EmbedUtils.sendErrorEmbed(Templates.kick.member_not_found, event);
+            Templates.Kick.member_not_found.embed(event);
             return;
         }
 
         if (!author.canInteract(member)) {
-            EmbedUtils.sendErrorEmbed(Templates.kick.user_cannot_interact, event);
+            Templates.Kick.user_cannot_interact.embed(event);
             return;
         }
 
         Member selfMember = event.getGuild().getSelfMember();
 
         if (!selfMember.canInteract(member)) {
-            EmbedUtils.sendWarningEmbed(Templates.kick.bot_cannot_interact, event);
+            Templates.Kick.bot_cannot_interact.embed(event);
             return;
         }
 
@@ -69,8 +69,8 @@ public class KickCommand extends DefaultAdminCommand {
                                         kick.reason(reason);
 
                                     kick.queue(
-                                            success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.kick.success.format(member.getUser().getAsTag())).setActionRows().build()).queue()),
-                                            fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.kick.fail.format(member.getUser().getAsTag(), fail.getMessage())).setActionRows().build()).queue())
+                                            success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
+                                            fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
                                     );
                                 }).build(),
 
@@ -93,19 +93,19 @@ public class KickCommand extends DefaultAdminCommand {
         assert author != null;
 
         if (member == null) {
-            EmbedUtils.sendErrorEmbed(Templates.kick.member_not_found, event);
+            Templates.Kick.member_not_found.embed(event);
             return;
         }
 
         if (!author.canInteract(member)) {
-            EmbedUtils.sendErrorEmbed(Templates.kick.user_cannot_interact, event);
+            Templates.Kick.user_cannot_interact.embed(event);
             return;
         }
 
         Member selfMember = event.getGuild().getSelfMember();
 
         if (!selfMember.canInteract(member)) {
-            EmbedUtils.sendWarningEmbed(Templates.kick.bot_cannot_interact, event);
+            Templates.Kick.bot_cannot_interact.embed(event);
             return;
         }
 
@@ -119,8 +119,8 @@ public class KickCommand extends DefaultAdminCommand {
                                         kick.reason(reason);
 
                                     kick.queue(
-                                            success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.kick.success.format(member.getUser().getAsTag())).setActionRows().build()).queue()),
-                                            fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.kick.fail.format(member.getUser().getAsTag(), fail.getMessage())).setActionRows().build()).queue())
+                                            success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
+                                            fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
                                     );
                                 }).build(),
 
