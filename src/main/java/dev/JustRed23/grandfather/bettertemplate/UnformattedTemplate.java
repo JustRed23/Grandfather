@@ -17,7 +17,7 @@ public class UnformattedTemplate implements Template {
     }
 
     public FormattedTemplate format(Object... args) {
-        return FormattedTemplate.from(formatRaw(args));
+        return FormattedTemplate.from(String.format(message, args), type);
     }
 
     public UnformattedTemplate formatRaw(Object... args) {
