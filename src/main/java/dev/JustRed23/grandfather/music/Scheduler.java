@@ -72,6 +72,8 @@ public class Scheduler extends AudioEventAdapter {
 
     public void stop() {
         this.audioPlayer.stopTrack();
+        if (isPaused())
+            pause(true);
         AudioPlayerManager.getInstance().getLastActive().put(guild.getIdLong(), System.currentTimeMillis());
         AudioPlayerManager.getInstance().getMusicManager(guild).getTrackModifier().resetEffect();
     }
