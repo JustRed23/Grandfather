@@ -13,4 +13,8 @@ public class HttpUtils {
             return false;
         }
     }
+
+    public static String linkText(String text, String url) {
+        return "[" + text + "](" + url + ")";
+    }
 }

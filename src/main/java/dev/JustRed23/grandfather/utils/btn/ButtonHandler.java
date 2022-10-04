@@ -1,39 +1,39 @@
 package dev.JustRed23.grandfather.utils.btn;
 
+import com.google.common.collect.Lists;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class ButtonHandler {
 
-    private final HashMap<String, Pair<Consumer<ButtonInteractionEvent>, Consumer<ButtonInteractionEvent>>> buttons;
-    private final HashMap<String, List<User>> users;
+    private final HashMap<Long, Map<String, BetterButton>> buttons;
 
     public ButtonHandler() {
         this.buttons = new HashMap<>();
-        this.users = new HashMap<>();
     }
 
-    protected synchronized void addButton(@NotNull String buttonId, @Nullable List<User> allowedUsers, @NotNull Consumer<ButtonInteractionEvent> onTrigger, @NotNull Consumer<ButtonInteractionEvent> onComplete) {
-        if (buttons.containsKey(buttonId) || users.containsKey(buttonId)) {
+    protected synchronized void addButton(long msgID, BetterButton button) {
+        String buttonId = button.id;
+        Map<String, BetterButton> msgButtons = buttons.get(msgID);
+
+        if (msgButtons != null && msgButtons.containsKey(buttonId)) {
             System.err.println("Button with ID " + buttonId + " already exists!");
             return;
         }
 
-        users.put(buttonId, allowedUsers == null ? Collections.emptyList() : allowedUsers);
-        buttons.put(buttonId, Pair.of(onTrigger, onComplete));
+        if (msgButtons == null)
+            msgButtons = new HashMap<>();
+
+        msgButtons.put(buttonId, button);
+        buttons.put(msgID, msgButtons);
     }
 
     public void handle(ButtonInteractionEvent event) {
-        if (canHandle(event.getComponentId())) {
+        long msgID = event.getMessageIdLong();
+        if (canHandle(msgID, event.getComponentId())) {
             //get onTrigger and onComplete from component id
             //get allowed users from component id
             //if allowed users is empty -> fire on trigger and on complete + remove the button listener
@@ -41,40 +41,58 @@ public class ButtonHandler {
             //else ignore button click
 
             String buttonId = event.getComponentId();
-            Consumer<ButtonInteractionEvent> onTrigger = buttons.get(buttonId).getLeft();
-            Consumer<ButtonInteractionEvent> onComplete = buttons.get(buttonId).getRight();
 
-            List<User> allowedUsers = new ArrayList<>(users.get(buttonId));
+            BetterButton button = buttons.get(msgID).get(buttonId);
+
+            Consumer<ButtonInteractionEvent> onTrigger = button.onTrigger;
+            Consumer<ButtonInteractionEvent> onComplete = button.onComplete;
+
+            List<User> allowedUsers = Lists.newArrayList(button.allowedUsers);
             User currentUser = event.getUser();
 
             if (allowedUsers.isEmpty()) {
                 onTrigger.accept(event);
                 onComplete.accept(event);
-                removeButton(buttonId);
+
+                if (button.invalidateAfterUse)
+                    removeButton(msgID, buttonId);
             } else {
                 if (allowedUsers.contains(currentUser)) {
                     onTrigger.accept(event);
 
-                    allowedUsers.remove(currentUser);
-                    users.replace(buttonId, allowedUsers);
+                    if (button.invalidateAfterUse) {
+                        allowedUsers.remove(currentUser);
+                        button.allowedUsers = allowedUsers;
+                    }
 
-                    if (allowedUsers.isEmpty()) {
+                    if (allowedUsers.isEmpty() && button.invalidateAfterUse) {
                         onComplete.accept(event);
-                        removeButton(buttonId);
+                        removeButton(msgID, buttonId);
                     }
                 } else event.deferEdit().queue();
             }
         }
     }
 
-    public void removeButton(String buttonId) {
-        if (buttons.containsKey(buttonId)) {
-            buttons.remove(buttonId);
-            users.remove(buttonId);
+    public void handleRemove(long msgID) {
+        Map<String, BetterButton> msg = buttons.get(msgID);
+        if (msg != null)
+            buttons.remove(msgID);
+    }
+
+    public void removeButton(Long msgID, String buttonId) {
+        Map<String, BetterButton> msg = buttons.get(msgID);
+        if (msg != null) {
+            msg.remove(buttonId);
+            buttons.put(msgID, msg);
         }
     }
 
-    private boolean canHandle(String buttonId) {
-        return buttons.containsKey(buttonId) && users.containsKey(buttonId);
+    private boolean canHandle(Long msgID, String buttonId) {
+        Map<String, BetterButton> msg = buttons.get(msgID);
+        if (msg == null)
+            return false;
+
+        return msg.containsKey(buttonId);
     }
 }

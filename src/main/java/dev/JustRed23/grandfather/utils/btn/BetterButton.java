@@ -17,10 +17,16 @@ import java.util.function.Consumer;
 
 public class BetterButton {
 
-    private ButtonStyle style;
-    private String id;
-    private String label;
-    private Emoji emoji;
+    protected ButtonStyle style;
+    protected String id;
+    protected String label;
+    protected Emoji emoji;
+
+    protected Guild guild;
+    protected List<User> allowedUsers;
+    protected Consumer<ButtonInteractionEvent> onTrigger;
+    protected Consumer<ButtonInteractionEvent> onComplete;
+    protected boolean invalidateAfterUse = true;
 
     @Nonnull
     @CheckReturnValue
@@ -127,7 +133,10 @@ public class BetterButton {
         Checks.notNull(guild, "Guild");
         Checks.notNull(onTrigger, "ButtonClickEvent");
         Checks.notNull(onComplete, "ButtonClickEvent");
-        getButtonHandler(guild).addButton(id, null, onTrigger, onComplete);
+        this.guild = guild;
+        this.allowedUsers = Collections.emptyList();
+        this.onTrigger = onTrigger;
+        this.onComplete = onComplete;
         return this;
     }
 
@@ -139,7 +148,10 @@ public class BetterButton {
         Checks.notNull(allowedUser, "User");
         Checks.notNull(onTrigger, "ButtonClickEvent");
         Checks.notNull(onComplete, "ButtonClickEvent");
-        getButtonHandler(guild).addButton(id, Collections.singletonList(allowedUser), onTrigger, onComplete);
+        this.guild = guild;
+        this.allowedUsers = Collections.singletonList(allowedUser);
+        this.onTrigger = onTrigger;
+        this.onComplete = onComplete;
         return this;
     }
 
@@ -151,12 +163,23 @@ public class BetterButton {
         Checks.notNull(allowedUsers, "Users");
         Checks.notNull(onTrigger, "ButtonClickEvent");
         Checks.notNull(onComplete, "ButtonClickEvent");
-        getButtonHandler(guild).addButton(id, allowedUsers, onTrigger, onComplete);
+        this.guild = guild;
+        this.allowedUsers = allowedUsers;
+        this.onTrigger = onTrigger;
+        this.onComplete = onComplete;
         return this;
     }
 
     @Nonnull
-    public Button build() {
+    @CheckReturnValue
+    public BetterButton noInvalidateAfterUse() {
+        invalidateAfterUse = false;
+        return this;
+    }
+
+    @Nonnull
+    public Button build(long msgID) {
+        getButtonHandler(guild).addButton(msgID, this);
         return Button.of(style, id, label, emoji);
     }
 

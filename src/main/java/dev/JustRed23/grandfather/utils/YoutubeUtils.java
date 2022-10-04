@@ -80,4 +80,18 @@ public class YoutubeUtils {
     public static String getVideoID(String youtube_link) {
         return youtube_link.replace("https://www.youtube.com/watch?v=", "");
     }
+
+    public static boolean isLive(String videoID) throws IOException {
+        List<Video> details = youTube.videos()
+                .list(Collections.singletonList("liveStreamingDetails"))
+                .setId(Collections.singletonList(videoID))
+                .setKey(Bot.youtube_api_key)
+                .execute()
+                .getItems();
+
+        if (!details.isEmpty())
+            return details.get(0).getLiveStreamingDetails() != null;
+
+        return false;
+    }
 }

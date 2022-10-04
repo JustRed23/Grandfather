@@ -5,7 +5,6 @@ import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultAdminCommand;
 import dev.JustRed23.grandfather.utils.UserUtils;
 import dev.JustRed23.grandfather.utils.btn.BetterButton;
-import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,6 +16,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import org.jooq.tools.StringUtils;
 
@@ -59,26 +60,29 @@ public class KickCommand extends DefaultAdminCommand {
 
         String reason = StringUtils.join(args.stream().skip(1).toList(), " ");
 
-        event.getChannel().sendMessage("Are you sure you want to kick " + member.getUser().getAsTag() + "?")
-                .setActionRow(
-                        new BetterButton().success("grandfather:kick:yes", "Yes")
-                                .onEvent(guild, event.getAuthor(), trigger -> {}, complete -> {
-                                    AuditableRestAction<Void> kick = guild.kick(member);
+        event.getChannel().sendMessage("Are you sure you want to kick " + member.getUser().getAsTag() + "?").queue(message -> {
+            Button[] buttons = new Button[] {
+                    new BetterButton().success("grandfather:kick:yes", "Yes")
+                            .onEvent(guild, event.getAuthor(), trigger -> {}, complete -> {
+                                AuditableRestAction<Void> kick = guild.kick(member);
 
-                                    if (!reason.isEmpty())
-                                        kick.reason(reason);
+                                if (!reason.isEmpty())
+                                    kick.reason(reason);
 
-                                    kick.queue(
-                                            success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
-                                            fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
-                                    );
-                                }).build(),
+                                kick.queue(
+                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
+                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
+                                );
+                            }).build(message.getIdLong()),
 
-                        new BetterButton().danger("grandfather:kick:no", "No")
-                                .onEvent(guild, event.getAuthor(), trigger -> {}, complete ->
-                                        complete.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue())
-                                ).build()
-                ).queue();
+                    new BetterButton().danger("grandfather:kick:no", "No")
+                            .onEvent(guild, event.getAuthor(), trigger -> {}, complete ->
+                                    complete.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue())
+                            ).build(message.getIdLong())
+            };
+
+            message.editMessageComponents(ActionRow.of(buttons)).queue();
+        });
     }
 
     public void execute(CommandContext context, SlashCommandInteractionEvent event) {
@@ -109,26 +113,29 @@ public class KickCommand extends DefaultAdminCommand {
             return;
         }
 
-        event.reply("Are you sure you want to kick " + member.getUser().getAsTag() + "?")
-                .addActionRow(
-                        new BetterButton().success("grandfather:kick:yes", "Yes")
-                                .onEvent(guild, event.getUser(), trigger -> {}, complete -> {
-                                    AuditableRestAction<Void> kick = guild.kick(member);
+        event.reply("Are you sure you want to kick " + member.getUser().getAsTag() + "?").queue(message -> {
+            Button[] buttons = new Button[] {
+                    new BetterButton().success("grandfather:kick:yes", "Yes")
+                            .onEvent(guild, event.getUser(), trigger -> {}, complete -> {
+                                AuditableRestAction<Void> kick = guild.kick(member);
 
-                                    if (!reason.isEmpty())
-                                        kick.reason(reason);
+                                if (!reason.isEmpty())
+                                    kick.reason(reason);
 
-                                    kick.queue(
-                                            success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
-                                            fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
-                                    );
-                                }).build(),
+                                kick.queue(
+                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
+                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
+                                );
+                            }).build(message.retrieveOriginal().complete().getIdLong()),
 
-                        new BetterButton().danger("grandfather:kick:no", "No")
-                                .onEvent(guild, event.getUser(), trigger -> {}, complete ->
-                                        complete.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue())
-                                ).build()
-                ).queue();
+                    new BetterButton().danger("grandfather:kick:no", "No")
+                            .onEvent(guild, event.getUser(), trigger -> {}, complete ->
+                                    complete.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue())
+                            ).build(message.retrieveOriginal().complete().getIdLong())
+            };
+
+            message.editOriginalComponents(ActionRow.of(buttons)).queue();
+        });
     }
 
     public String getName() {

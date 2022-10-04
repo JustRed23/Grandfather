@@ -176,20 +176,20 @@ public class PlayCommand extends DefaultMusicCommand {
 
         List<Button> buttons = new ArrayList<>();
 
-        for (int i = 1; i <= searched.size(); i++) {
-            int finalI = i;
-            buttons.add(new BetterButton().primary("grandfather:play:option-" + i, String.valueOf(i)).onEvent(
-                    channel.getGuild(), user, unused -> {},
-                    e -> {
-                        for (int j = 1; j <= searched.size(); j++)
-                            CommandHandler.getButtonHandler(channel.getGuild()).removeButton("grandfather:play:option-" + j);
-                        e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue());
-                        AudioPlayerManager.getInstance().loadAndPlay(channel, user, YoutubeUtils.getVideo(searched.get(finalI - 1).getId().getVideoId()));
-                    }
-            ).build());
-        }
+        channel.sendMessageEmbeds(builder.build()).queue(message -> {
+            for (int i = 1; i <= searched.size(); i++) {
+                int finalI = i;
+                buttons.add(new BetterButton().primary("grandfather:play:option-" + i, String.valueOf(i)).onEvent(
+                        channel.getGuild(), user, unused -> {},
+                        e -> {
+                            e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue());
+                            AudioPlayerManager.getInstance().loadAndPlay(channel, user, YoutubeUtils.getVideo(searched.get(finalI - 1).getId().getVideoId()));
+                        }
+                ).build(message.getIdLong()));
+            }
 
-        EmbedUtils.sendEmbedWithActionRows(builder, event, ActionRow.of(buttons));
+            message.editMessageComponents(ActionRow.of(buttons)).queue();
+        });
     }
 
     public String getName() {

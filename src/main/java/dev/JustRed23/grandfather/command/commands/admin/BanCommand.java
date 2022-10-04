@@ -17,6 +17,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import org.jooq.tools.StringUtils;
 
@@ -59,26 +61,29 @@ public class BanCommand extends DefaultAdminCommand {
 
         String reason = StringUtils.join(args.stream().skip(1).toList(), " ");
 
-        event.getChannel().sendMessage("Are you sure you want to ban " + member.getUser().getAsTag() + "?")
-                .setActionRow(
-                        new BetterButton().success("grandfather:ban:yes", "Yes")
-                                .onEvent(guild, event.getAuthor(), trigger -> {}, complete -> {
-                                    AuditableRestAction<Void> ban = guild.ban(member, 0);
+        event.getChannel().sendMessage("Are you sure you want to ban " + member.getUser().getAsTag() + "?").queue(message -> {
+            Button[] buttons = new Button[] {
+                    new BetterButton().success("grandfather:ban:yes", "Yes")
+                            .onEvent(guild, event.getAuthor(), trigger -> {}, complete -> {
+                                AuditableRestAction<Void> ban = guild.ban(member, 0);
 
-                                    if (!reason.isEmpty())
-                                        ban.reason(reason);
+                                if (!reason.isEmpty())
+                                    ban.reason(reason);
 
-                                    ban.queue(
-                                            success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
-                                            fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
-                                    );
-                                }).build(),
+                                ban.queue(
+                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
+                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
+                                );
+                            }).build(message.getIdLong()),
 
-                        new BetterButton().danger("grandfather:ban:no", "No")
-                                .onEvent(guild, event.getAuthor(), trigger -> {}, complete ->
-                                        complete.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue())
-                                ).build()
-                ).queue();
+                    new BetterButton().danger("grandfather:ban:no", "No")
+                            .onEvent(guild, event.getAuthor(), trigger -> {}, complete ->
+                                    complete.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue())
+                            ).build(message.getIdLong())
+            };
+
+            message.editMessageComponents(ActionRow.of(buttons)).queue();
+        });
     }
 
     public void execute(CommandContext context, SlashCommandInteractionEvent event) {
@@ -109,26 +114,29 @@ public class BanCommand extends DefaultAdminCommand {
             return;
         }
 
-        event.reply("Are you sure you want to ban " + member.getUser().getAsTag() + "?")
-                .addActionRow(
-                        new BetterButton().success("grandfather:ban:yes", "Yes")
-                                .onEvent(guild, event.getUser(), trigger -> {}, complete -> {
-                                    AuditableRestAction<Void> ban = guild.ban(member, 0);
+        event.reply("Are you sure you want to ban " + member.getUser().getAsTag() + "?").queue(message -> {
+            Button[] buttons = new Button[] {
+                    new BetterButton().success("grandfather:ban:yes", "Yes")
+                            .onEvent(guild, event.getUser(), trigger -> {}, complete -> {
+                                AuditableRestAction<Void> ban = guild.ban(member, 0);
 
-                                    if (!reason.isEmpty())
-                                        ban.reason(reason);
+                                if (!reason.isEmpty())
+                                    ban.reason(reason);
 
-                                    ban.queue(
-                                            success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
-                                            fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
-                                    );
-                                }).build(),
+                                ban.queue(
+                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
+                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
+                                );
+                            }).build(message.retrieveOriginal().complete().getIdLong()),
 
-                        new BetterButton().danger("grandfather:ban:no", "No")
-                                .onEvent(guild, event.getUser(), trigger -> {}, complete ->
-                                        complete.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue())
-                                ).build()
-                ).queue();
+                    new BetterButton().danger("grandfather:ban:no", "No")
+                            .onEvent(guild, event.getUser(), trigger -> {}, complete ->
+                                    complete.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue())
+                            ).build(message.retrieveOriginal().complete().getIdLong())
+            };
+
+            message.editOriginalComponents(ActionRow.of(buttons)).queue();
+        });
     }
 
     public String getName() {

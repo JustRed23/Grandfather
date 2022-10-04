@@ -1,11 +1,13 @@
 package dev.JustRed23.grandfather.event;
 
 import dev.JustRed23.grandfather.command.handler.CommandHandler;
+import dev.JustRed23.grandfather.utils.MusicUtils;
 import dev.JustRed23.grandfather.utils.msg.ReactionHandler;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -27,6 +29,11 @@ public class BasicEventListener extends ListenerAdapter {
             return;
 
         CommandHandler.handle(event.getChannel(), event.getMessage().getContentRaw(), event);
+    }
+
+    public void onMessageDelete(@NotNull MessageDeleteEvent event) {
+        CommandHandler.getButtonHandler(event.getGuild()).handleRemove(event.getMessageIdLong());
+        MusicUtils.invalidatePage(event.getMessageIdLong());
     }
 
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {

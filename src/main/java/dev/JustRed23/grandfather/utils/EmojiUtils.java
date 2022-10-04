@@ -59,7 +59,8 @@ public class EmojiUtils {
         PREV_TRACK = "\u23EE",
         NEXT_TRACK = "\u23ED",
         MUSIC_NOTE = "\uD83C\uDFB5",
-        SPEAKER = "\uD83D\uDD0A";
+        SPEAKER = "\uD83D\uDD0A",
+        LIVE = "\uD83D\uDD34";
     }
 
     public class Misc {
