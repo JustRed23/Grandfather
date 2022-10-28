@@ -40,7 +40,7 @@ dependencies {
 
     //JDA
     implementation 'net.dv8tion:JDA:5.0.0-alpha.17'
-    implementation 'ch.qos.logback:logback-classic:1.4.1'
+    implementation 'ch.qos.logback:logback-classic:1.4.4'
     implementation 'me.duncte123:botCommons:2.3.14'
 
     //Music
@@ -51,7 +51,7 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
 
     //Youtube Data API
-    implementation 'com.google.apis:google-api-services-youtube:v3-rev20220719-2.0.0'
+    implementation 'com.google.apis:google-api-services-youtube:v3-rev20220926-2.0.0'
 }
 
 jar {
