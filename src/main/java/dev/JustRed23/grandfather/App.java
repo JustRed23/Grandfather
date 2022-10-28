@@ -76,7 +76,7 @@ public class App extends Application {
     }
 
     protected void stop() throws Exception {
-        if (shardManager == null)
+        if (shardManager == null || !Bot.enabled)
             return;
         AudioPlayerManager.getInstance().shutdown();
         BotCommons.shutdown(shardManager);
