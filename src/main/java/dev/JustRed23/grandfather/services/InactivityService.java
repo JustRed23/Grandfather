@@ -1,6 +1,7 @@
 package dev.JustRed23.grandfather.services;
 
 import dev.JustRed23.grandfather.App;
+import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
 import dev.JustRed23.stonebrick.service.Service;
@@ -28,7 +29,7 @@ public class InactivityService extends Service {
     }
 
     public boolean shouldRun() {
-        return true;
+        return Bot.enabled;
     }
 
     public void run() throws Exception {
