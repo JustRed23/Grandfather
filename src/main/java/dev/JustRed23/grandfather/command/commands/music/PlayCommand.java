@@ -17,6 +17,7 @@ import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
 import dev.JustRed23.grandfather.utils.msg.MessageUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -176,6 +177,12 @@ public class PlayCommand extends DefaultMusicCommand {
 
         List<Button> buttons = new ArrayList<>();
 
+        BetterButton del = new BetterButton()
+                .danger("grandfather:play:delete", Emoji.fromUnicode(EmojiUtils.General.GRAY_NO))
+                .onEvent(channel.getGuild(), user, unused -> {}, e -> {
+                    e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue());
+                });
+
         channel.sendMessageEmbeds(builder.build()).queue(message -> {
             for (int i = 1; i <= searched.size(); i++) {
                 int finalI = i;
@@ -188,7 +195,7 @@ public class PlayCommand extends DefaultMusicCommand {
                 ).build(message.getIdLong()));
             }
 
-            message.editMessageComponents(ActionRow.of(buttons)).queue();
+            message.editMessageComponents(ActionRow.of(buttons), ActionRow.of(del.build(message.getIdLong()))).queue();
         });
     }
 

@@ -68,7 +68,13 @@ public class QueueCommand extends DefaultMusicCommand {
                             .build(message.getIdLong())
             };
 
-            message.editMessageComponents(ActionRow.of(buttons)).queue();
+            BetterButton del = new BetterButton()
+                    .danger("grandfather:queue:delete", Emoji.fromUnicode(EmojiUtils.General.GRAY_NO))
+                    .onEvent(channel.getGuild(), author, unused -> {}, e -> {
+                        e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue());
+                    });
+
+            message.editMessageComponents(ActionRow.of(buttons), ActionRow.of(del.build(message.getIdLong()))).queue();
         });
     }
 

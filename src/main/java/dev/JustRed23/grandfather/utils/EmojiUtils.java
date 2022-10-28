@@ -41,6 +41,7 @@ public class EmojiUtils {
     public class General {
         public static final String YES = "\u2705",
         NO = "\u274C",
+        GRAY_NO = "\u2716",
         INFO = "\u2139",
         WARNING = "\u26A0",
         ERROR = "\uD83D\uDEAB";
@@ -66,6 +67,8 @@ public class EmojiUtils {
     public class Misc {
         public static final String WAVE_GOODBYE = "\uD83D\uDC4B",
         MAGNIFYING_GLASS = "\uD83D\uDD0E",
+        GEAR = "\u2699\uFE0F",
+        STOP_SIGN = "\uD83D\uDED1",
         NEXT = "\u23E9",
         PREVIOUS = "\u23EA",
         NOTEPAD = "\uD83D\uDDD2",
