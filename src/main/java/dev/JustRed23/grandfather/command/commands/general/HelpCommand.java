@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HelpCommand extends DefaultGuildCommand {
 
@@ -54,6 +55,7 @@ public class HelpCommand extends DefaultGuildCommand {
 
         String searchTerm = args.get(0);
 
+        AtomicBoolean categoryFound = new AtomicBoolean(false);
         Arrays.stream(Category.values()).filter(Category::canShow).forEach(category -> {
             if (searchTerm.equalsIgnoreCase(category.name())) {
                 builder.setTitle("Showing commands of category '" + category.toString().toLowerCase() + "'");
@@ -73,7 +75,11 @@ public class HelpCommand extends DefaultGuildCommand {
             } else return;
 
             EmbedUtils.sendEmbed(builder, event);
+            categoryFound.set(true);
         });
+
+        if (categoryFound.get())
+            return;
 
         ICommand command = CommandHandler.getCommand(searchTerm);
 
