@@ -65,7 +65,6 @@ public class Scheduler extends AudioEventAdapter {
             return;
         }
 
-        this.prev.add(audioPlayer.getPlayingTrack().makeClone());
         this.audioPlayer.startTrack(queue.poll(), false);
         showTrackInfo(null);
     }
