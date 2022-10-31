@@ -42,10 +42,10 @@ public final class CommandHandler {
     private CommandHandler() {}
 
     public static void init() {
-        LOGGER.info("==================== Initializing command handler ====================");
+        LOGGER.info("=====Initializing command handler=====");
         LOGGER.info("Initializing commands:");
         addCommands().forEach(iCommand -> LOGGER.info("\tCommand {} loaded successfully", iCommand.getName()));
-        LOGGER.info("==================== Command handler initialized ====================");
+        LOGGER.info("=====Command handler initialized=====");
     }
 
     private static List<ICommand> addCommands() {
