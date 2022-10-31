@@ -12,9 +12,12 @@ buildscript {
 
 plugins {
     id 'java'
+    id 'application'
     id 'net.nemerosa.versioning' version '2.14.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
+mainClassName = 'dev.JustRed23.grandfather.App'
 group 'dev.JustRed23'
 
 allprojects {
@@ -54,21 +57,9 @@ dependencies {
     implementation 'com.google.apis:google-api-services-youtube:v3-rev20220926-2.0.0'
 }
 
-jar {
+shadowJar {
+    archiveFileName = 'Grandfather.jar'
     manifest {
-        attributes('Main-Class': 'dev.JustRed23.grandfather.App')
         attributes('Implementation-Title': project.name, 'Implementation-Version': versioning.info.build)
     }
-}
-
-task fatJar(type: Jar) {
-    manifest.from jar.manifest
-    classifier = 'all'
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    } {
-        exclude "META-INF/**"
-        exclude "module-info.class"
-    }
-    with jar
 }
