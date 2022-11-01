@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.events.Event;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.TimeUnit;
+
 public class FormattedTemplate implements Template {
 
     private final TemplateType type;
@@ -21,8 +23,16 @@ public class FormattedTemplate implements Template {
         MessageUtils.sendMessage(getMessage(), event);
     }
 
+    public void messageAndDelete(Event event, int delay, TimeUnit unit) {
+        MessageUtils.sendMessageAndDeleteAfter(getMessage(), event, delay, unit);
+    }
+
     public void message(@NotNull TextChannel channel) {
         channel.sendMessage(getMessage()).queue();
+    }
+
+    public void messageAndDelete(@NotNull TextChannel channel, int delay, TimeUnit unit) {
+        channel.sendMessage(getMessage()).queue(message -> message.delete().queueAfter(delay, unit));
     }
 
     public void embed(Event event) {

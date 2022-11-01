@@ -75,6 +75,17 @@ public final class Templates {
                 fail = new UnformattedTemplate("%s `%s` could not be banned: %s", ERROR);
     }
 
+    public static final class Clean {
+        public static final FormattedTemplate
+                provide_amount = FormattedTemplate.from(new UnformattedTemplate("%s Please provide an amount of messages to delete", WARNING)),
+                invalid_amount = FormattedTemplate.from(new UnformattedTemplate("%s Please provide a valid amount of messages to delete (1-1000)", WARNING)),
+                no_messages = FormattedTemplate.from(new UnformattedTemplate("%s There are no messages to delete", INFO));
+
+        public static final UnformattedTemplate
+                success = new UnformattedTemplate("%s Successfully deleted %s message(s)", INFO),
+                fail = new UnformattedTemplate("%s Could not delete message(s): %s", ERROR);
+    }
+
     public static final class Help {
         public static final UnformattedTemplate
                 no_command_or_category = new UnformattedTemplate("%s No command or category found for `%s`", ERROR),
