@@ -86,10 +86,10 @@ public class Scheduler extends AudioEventAdapter {
     }
 
     public void stopAndClear() {
+        stop();
         this.queue.clear();
         this.prev.clear();
         AudioPlayerManager.getInstance().getLastActive().remove(guild.getIdLong());
-        stop();
     }
 
     public void disconnect() {

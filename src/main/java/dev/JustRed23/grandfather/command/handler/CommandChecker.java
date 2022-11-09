@@ -16,6 +16,8 @@ import static dev.JustRed23.grandfather.command.handler.CheckTypes.*;
 
 public class CommandChecker {
 
+    private static boolean enabled = true;
+
     private CommandChecker() {}
 
     public static CommandTypes isCommand(MessageChannel channel, String message) {
@@ -28,7 +30,10 @@ public class CommandChecker {
 
     public static CheckTypes doChecks(ICommand command, User u, MessageChannel c, boolean isPrivateMessage) {
         if (command == null)
-            return COMMAND_NOT_FOUND;
+            return enabled ? COMMAND_NOT_FOUND : SUPPRESSED_FAIL;
+
+        if (!enabled && !(command instanceof DefaultInternalCommand))
+            return SUPPRESSED_FAIL;
 
         if (command instanceof DefaultInternalCommand && !u.getId().equals(Bot.owner_id))
             return COMMAND_NO_PERMISSION;
@@ -106,5 +111,13 @@ public class CommandChecker {
         return message.startsWith(Bot.prefix)
                 || message.startsWith("<@" + channel.getJDA().getSelfUser().getId() + ">")
                 ? CommandTypes.PRIVATE : CommandTypes.INVALID;
+    }
+
+    public static void enable() {
+        enabled = true;
+    }
+
+    public static void disable() {
+        enabled = false;
     }
 }

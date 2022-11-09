@@ -135,8 +135,12 @@ public class AudioPlayerManager {
         return INSTANCE;
     }
 
+    public void disconnect() {
+        this.musicManagers.forEach((id, manager) -> manager.getScheduler().disconnect());
+    }
+
     public void shutdown() {
-        this.musicManagers.forEach((aLong, musicManager) -> musicManager.getScheduler().disconnect());
+        disconnect();
         this.musicManagers.clear();
     }
 

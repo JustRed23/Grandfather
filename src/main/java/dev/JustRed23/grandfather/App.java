@@ -55,9 +55,13 @@ public class App extends Application {
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                .setActivity(Activity.watching("TV"));
+                .setActivity(getDefaultActivity());
 
         getServicePool().addService(InactivityService.class);
+    }
+
+    public static Activity getDefaultActivity() {
+        return Activity.watching("TV");
     }
 
     protected void start() throws Exception {
