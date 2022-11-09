@@ -41,7 +41,8 @@ public class App extends Application {
                         GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
                         GatewayIntent.GUILD_VOICE_STATES,
                         GatewayIntent.DIRECT_MESSAGES,
-                        GatewayIntent.MESSAGE_CONTENT
+                        GatewayIntent.MESSAGE_CONTENT,
+                        GatewayIntent.SCHEDULED_EVENTS
                 )
                 .disableCache(
                         CacheFlag.CLIENT_STATUS,

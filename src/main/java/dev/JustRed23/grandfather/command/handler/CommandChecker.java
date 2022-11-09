@@ -11,6 +11,9 @@ import dev.JustRed23.grandfather.utils.Settings;
 import dev.JustRed23.grandfather.utils.UserUtils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import static dev.JustRed23.grandfather.command.handler.CheckTypes.*;
 

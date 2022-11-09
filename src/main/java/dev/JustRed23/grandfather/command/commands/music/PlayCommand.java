@@ -4,7 +4,6 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.VideoContentDetails;
 import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.CommandContext;
-import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.command.types.DefaultMusicCommand;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
@@ -13,10 +12,10 @@ import dev.JustRed23.grandfather.utils.HttpUtils;
 import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.grandfather.utils.YoutubeUtils;
 import dev.JustRed23.grandfather.utils.btn.BetterButton;
-import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
 import dev.JustRed23.grandfather.utils.msg.MessageUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -141,7 +140,7 @@ public class PlayCommand extends DefaultMusicCommand {
                     return;
                 }
 
-                showResults(url, channel, user, searched, event);
+                showResults(url, channel, user, searched);
             } catch (IOException e) {
                 MessageUtils.sendMessage(EmojiUtils.General.NO + " Something went wrong. Try again later.", event);
                 e.printStackTrace();
@@ -150,7 +149,7 @@ public class PlayCommand extends DefaultMusicCommand {
             AudioPlayerManager.getInstance().loadAndPlay(channel, user, url);
     }
 
-    private void showResults(String url, TextChannel channel, User user, List<SearchResult> searched, Event event) throws IOException {
+    private void showResults(String url, TextChannel channel, User user, List<SearchResult> searched) throws IOException {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.YELLOW);
         builder.setTitle("Showing results for: `" + url + "`");
@@ -179,9 +178,7 @@ public class PlayCommand extends DefaultMusicCommand {
 
         BetterButton del = new BetterButton()
                 .danger("grandfather:play:delete", Emoji.fromUnicode(EmojiUtils.General.GRAY_NO))
-                .onEvent(channel.getGuild(), user, unused -> {}, e -> {
-                    e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue());
-                });
+                .onEvent(channel.getGuild(), user, unused -> {}, e -> e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue()));
 
         channel.sendMessageEmbeds(builder.build()).queue(message -> {
             for (int i = 1; i <= searched.size(); i++) {

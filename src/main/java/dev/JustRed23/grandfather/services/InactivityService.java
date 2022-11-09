@@ -6,8 +6,8 @@ import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.music.MusicManager;
 import dev.JustRed23.stonebrick.service.Service;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 
 import java.util.HashSet;
 import java.util.Map;

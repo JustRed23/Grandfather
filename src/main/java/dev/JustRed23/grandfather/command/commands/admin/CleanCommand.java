@@ -4,8 +4,7 @@ import dev.JustRed23.grandfather.bettertemplate.Templates;
 import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultAdminCommand;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,18 +12,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CleanCommand extends DefaultAdminCommand {
 
     public void execute(CommandContext context, MessageReceivedEvent event) {
         List<String> args = context.getArgs();
-        int amount = 0;
+        int amount;
 
         if (args.size() > 0) {
             try {

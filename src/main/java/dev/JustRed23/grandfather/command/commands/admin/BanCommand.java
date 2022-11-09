@@ -5,12 +5,10 @@ import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultAdminCommand;
 import dev.JustRed23.grandfather.utils.UserUtils;
 import dev.JustRed23.grandfather.utils.btn.BetterButton;
-import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -23,6 +21,7 @@ import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import org.jooq.tools.StringUtils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class BanCommand extends DefaultAdminCommand {
 
@@ -65,14 +64,18 @@ public class BanCommand extends DefaultAdminCommand {
             Button[] buttons = new Button[] {
                     new BetterButton().success("grandfather:ban:yes", "Yes")
                             .onEvent(guild, event.getAuthor(), trigger -> {}, complete -> {
-                                AuditableRestAction<Void> ban = guild.ban(member, 0);
+                                AuditableRestAction<Void> ban = guild.ban(member, 0, TimeUnit.DAYS);
 
                                 if (!reason.isEmpty())
                                     ban.reason(reason);
 
                                 ban.queue(
-                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
-                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
+                                        success -> complete.deferEdit()
+                                                .queue(hook -> hook.editOriginal(Templates.Ban.success.format(member.getUser().getAsTag()).getMessage())
+                                                        .setComponents().queue()),
+                                        fail -> complete.deferEdit()
+                                                .queue(hook -> hook.editOriginal(Templates.Ban.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage())
+                                                        .setComponents().queue())
                                 );
                             }).build(message.getIdLong()),
 
@@ -118,14 +121,18 @@ public class BanCommand extends DefaultAdminCommand {
             Button[] buttons = new Button[] {
                     new BetterButton().success("grandfather:ban:yes", "Yes")
                             .onEvent(guild, event.getUser(), trigger -> {}, complete -> {
-                                AuditableRestAction<Void> ban = guild.ban(member, 0);
+                                AuditableRestAction<Void> ban = guild.ban(member, 0, TimeUnit.DAYS);
 
                                 if (!reason.isEmpty())
                                     ban.reason(reason);
 
                                 ban.queue(
-                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
-                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Ban.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
+                                        success -> complete.deferEdit()
+                                                .queue(hook -> hook.editOriginal(Templates.Ban.success.format(member.getUser().getAsTag()).getMessage())
+                                                        .setComponents().queue()),
+                                        fail -> complete.deferEdit()
+                                                .queue(hook -> hook.editOriginal(Templates.Ban.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage())
+                                                        .setComponents().queue())
                                 );
                             }).build(message.retrieveOriginal().complete().getIdLong()),
 

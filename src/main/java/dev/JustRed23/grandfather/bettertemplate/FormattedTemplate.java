@@ -2,7 +2,7 @@ package dev.JustRed23.grandfather.bettertemplate;
 
 import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
 import dev.JustRed23.grandfather.utils.msg.MessageUtils;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.Event;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

@@ -42,7 +42,7 @@ dependencies {
     implementation 'com.github.JustRed23:Stonebrick:v1.3'
 
     //JDA
-    implementation 'net.dv8tion:JDA:5.0.0-alpha.17'
+    implementation 'net.dv8tion:JDA:5.0.0-alpha.22'
     implementation 'ch.qos.logback:logback-classic:1.4.4'
     implementation 'me.duncte123:botCommons:2.3.14'
 

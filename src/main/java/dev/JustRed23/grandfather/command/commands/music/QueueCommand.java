@@ -8,8 +8,8 @@ import dev.JustRed23.grandfather.utils.EmojiUtils;
 import dev.JustRed23.grandfather.utils.MusicUtils;
 import dev.JustRed23.grandfather.utils.btn.BetterButton;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -70,9 +70,7 @@ public class QueueCommand extends DefaultMusicCommand {
 
             BetterButton del = new BetterButton()
                     .danger("grandfather:queue:delete", Emoji.fromUnicode(EmojiUtils.General.GRAY_NO))
-                    .onEvent(channel.getGuild(), author, unused -> {}, e -> {
-                        e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue());
-                    });
+                    .onEvent(channel.getGuild(), author, unused -> {}, e -> e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue()));
 
             message.editMessageComponents(ActionRow.of(buttons), ActionRow.of(del.build(message.getIdLong()))).queue();
         });

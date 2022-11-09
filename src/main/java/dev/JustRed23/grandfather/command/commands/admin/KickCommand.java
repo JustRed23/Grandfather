@@ -5,11 +5,10 @@ import dev.JustRed23.grandfather.command.CommandContext;
 import dev.JustRed23.grandfather.command.types.DefaultAdminCommand;
 import dev.JustRed23.grandfather.utils.UserUtils;
 import dev.JustRed23.grandfather.utils.btn.BetterButton;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -70,8 +69,8 @@ public class KickCommand extends DefaultAdminCommand {
                                     kick.reason(reason);
 
                                 kick.queue(
-                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
-                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
+                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setComponents().queue()),
+                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setComponents().queue())
                                 );
                             }).build(message.getIdLong()),
 
@@ -123,8 +122,8 @@ public class KickCommand extends DefaultAdminCommand {
                                     kick.reason(reason);
 
                                 kick.queue(
-                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setActionRows().build()).queue()),
-                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(new MessageBuilder(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setActionRows().build()).queue())
+                                        success -> complete.deferEdit().queue(hook -> hook.editOriginal(Templates.Kick.success.format(member.getUser().getAsTag()).getMessage()).setComponents().queue()),
+                                        fail -> complete.deferEdit().queue(hook -> hook.editOriginal(Templates.Kick.fail.format(member.getUser().getAsTag(), fail.getMessage()).getMessage()).setComponents().queue())
                                 );
                             }).build(message.retrieveOriginal().complete().getIdLong()),
 

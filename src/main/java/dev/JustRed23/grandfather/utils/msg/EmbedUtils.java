@@ -2,7 +2,7 @@ package dev.JustRed23.grandfather.utils.msg;
 
 import dev.JustRed23.grandfather.bettertemplate.FormattedTemplate;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -89,9 +89,9 @@ public class EmbedUtils {
 
     public static void sendEmbedWithActionRows(EmbedBuilder embedBuilder, Event event, ActionRow... actionRows) {
         switch (EventType.getEventType(event)) {
-            case PRIVATE -> ((MessageReceivedEvent) event).getChannel().asPrivateChannel().sendMessageEmbeds(embedBuilder.build()).setActionRows(actionRows).queue();
-            case GUILD -> ((MessageReceivedEvent) event).getChannel().asGuildMessageChannel().sendMessageEmbeds(embedBuilder.build()).setActionRows(actionRows).queue();
-            case GUILD_SLASH -> ((SlashCommandInteractionEvent) event).deferReply().queue(response -> response.sendMessageEmbeds(embedBuilder.build()).addActionRows(actionRows).queue());
+            case PRIVATE -> ((MessageReceivedEvent) event).getChannel().asPrivateChannel().sendMessageEmbeds(embedBuilder.build()).setComponents(actionRows).queue();
+            case GUILD -> ((MessageReceivedEvent) event).getChannel().asGuildMessageChannel().sendMessageEmbeds(embedBuilder.build()).setComponents(actionRows).queue();
+            case GUILD_SLASH -> ((SlashCommandInteractionEvent) event).deferReply().queue(response -> response.sendMessageEmbeds(embedBuilder.build()).setComponents(actionRows).queue());
             case UNKNOWN -> throw new IllegalArgumentException("Event type can only be one of the following: PRIVATE, GUILD, GUILD_SLASH");
         }
     }

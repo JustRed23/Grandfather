@@ -10,7 +10,7 @@ import dev.JustRed23.grandfather.utils.MusicUtils;
 import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.jetbrains.annotations.Nullable;

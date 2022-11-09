@@ -2,7 +2,7 @@ package dev.JustRed23.grandfather.utils;
 
 import dev.JustRed23.grandfather.Bot;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
