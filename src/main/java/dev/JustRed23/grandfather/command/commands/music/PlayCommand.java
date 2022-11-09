@@ -192,7 +192,11 @@ public class PlayCommand extends DefaultMusicCommand {
                 ).build(message.getIdLong()));
             }
 
-            message.editMessageComponents(ActionRow.of(buttons), ActionRow.of(del.build(message.getIdLong()))).queue();
+            //if searched size is less than 5, add the del button to the buttons list
+            if (searched.size() < 5) {
+                buttons.add(del.build(message.getIdLong()));
+                message.editMessageComponents(ActionRow.of(buttons)).queue();
+            } else message.editMessageComponents(ActionRow.of(buttons), ActionRow.of(del.build(message.getIdLong()))).queue();
         });
     }
 
