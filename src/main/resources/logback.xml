@@ -8,6 +8,8 @@
 
     <logger name="org.reflections.Reflections" level="off" />
 
+    <logger name="dev.JustRed23.abcm.Config" level="debug" />
+
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

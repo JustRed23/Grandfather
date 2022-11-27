@@ -1,5 +1,6 @@
 package dev.JustRed23.grandfather;
 
+import dev.JustRed23.abcm.Config;
 import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.event.BasicEventListener;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
@@ -92,6 +93,7 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        Config.setDebug(true);
         launch(args);
     }
 }
