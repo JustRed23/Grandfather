@@ -100,7 +100,7 @@ public class AudioPlayerManager {
 
                 tracks.forEach(track -> {
                     musicManager.queue(track);
-                    track.setUserData(user.getAsTag());
+                    track.setUserData(user);
                 });
 
                 long totalTimeMs = tracks.stream().mapToLong(AudioTrack::getDuration).sum();

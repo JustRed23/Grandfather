@@ -28,7 +28,10 @@ public class MusicUtils {
         builder.setColor(Color.CYAN);
         builder.setAuthor("Now playing");
         builder.setThumbnail(YoutubeUtils.getThumbnail(YoutubeUtils.getVideoID(info.uri)));
-        builder.setFooter("Requested by " + track.getUserData(User.class).getAsTag(), track.getUserData(User.class).getEffectiveAvatarUrl());
+
+        User userData = track.getUserData(User.class);
+        if (userData != null)
+            builder.setFooter("Requested by " + userData.getAsTag(), userData.getEffectiveAvatarUrl());
 
         builder.setTitle(MarkdownSanitizer.escape(info.title, true), info.uri);
 
@@ -43,7 +46,10 @@ public class MusicUtils {
         builder.setColor(Color.CYAN);
         builder.setAuthor("Now playing");
         builder.setThumbnail(YoutubeUtils.getThumbnail(YoutubeUtils.getVideoID(info.uri)));
-        builder.setFooter("Requested by " + track.getUserData(User.class).getAsTag(), track.getUserData(User.class).getEffectiveAvatarUrl());
+
+        User userData = track.getUserData(User.class);
+        if (userData != null)
+            builder.setFooter("Requested by " + userData.getAsTag(), userData.getEffectiveAvatarUrl());
 
         long timeStamp = TimeUnit.MILLISECONDS.toSeconds(track.getPosition());
 
