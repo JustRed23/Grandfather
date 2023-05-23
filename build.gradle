@@ -39,15 +39,15 @@ repositories {
 
 dependencies {
     //Engine
-    implementation 'com.github.JustRed23:Stonebrick:v1.6.3'
+    implementation 'com.github.JustRed23:Stonebrick:v1.8'
 
     //JDA
-    implementation 'net.dv8tion:JDA:5.0.0-beta.6'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.9'
     implementation 'ch.qos.logback:logback-classic:1.4.5'
-    implementation 'me.duncte123:botCommons:2.3.14'
+    implementation 'me.duncte123:botCommons:beta_3.0.5'
 
     //Music
-    implementation 'com.github.walkyst:lavaplayer-fork:1.4.0'
+    implementation 'com.github.walkyst:lavaplayer-fork:1.4.1'
     implementation 'com.github.natanbc:lavadsp:0.7.4'
 
     //Class handling
