@@ -36,6 +36,8 @@ import java.util.List;
 
 public class PlayCommand extends DefaultMusicCommand {
 
+    private static final int MAX_RESULTS = 5;
+
     public void execute(CommandContext context, MessageReceivedEvent event) {
         List<String> args = context.getArgs();
         TextChannel channel = event.getChannel().asTextChannel();
@@ -133,14 +135,14 @@ public class PlayCommand extends DefaultMusicCommand {
             List<SearchResult> searched;
 
             try {
-                searched = YoutubeUtils.ytSearch(url, 5);
+                searched = YoutubeUtils.ytSearch(url, MAX_RESULTS);
 
                 if (searched == null) {
                     MessageUtils.sendMessage(EmojiUtils.Misc.MAGNIFYING_GLASS + " No results found for `" + url + "`", event);
                     return;
                 }
 
-                showResults(url, channel, user, searched);
+                showResults(url, channel, user, searched, MAX_RESULTS);
             } catch (IOException e) {
                 MessageUtils.sendMessage(EmojiUtils.General.NO + " Something went wrong. Try again later.", event);
                 e.printStackTrace();
@@ -149,7 +151,9 @@ public class PlayCommand extends DefaultMusicCommand {
             AudioPlayerManager.getInstance().loadAndPlay(channel, user, url);
     }
 
-    private void showResults(String url, TextChannel channel, User user, List<SearchResult> searched) throws IOException {
+    private void showResults(String url, TextChannel channel, User user, List<SearchResult> searched, int maxSize) throws IOException {
+        int size = Math.min(searched.size(), maxSize);
+
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.YELLOW);
         builder.setTitle("Showing results for: `" + url + "`");
@@ -159,7 +163,7 @@ public class PlayCommand extends DefaultMusicCommand {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < searched.size(); i++) {
+        for (int i = 0; i < size; i++) {
             SearchResult result = searched.get(i);
             stringBuilder.append("`#")
                     .append(i + 1)
@@ -181,7 +185,7 @@ public class PlayCommand extends DefaultMusicCommand {
                 .onEvent(channel.getGuild(), user, unused -> {}, e -> e.deferEdit().queue(interactionHook -> interactionHook.deleteOriginal().queue()));
 
         channel.sendMessageEmbeds(builder.build()).queue(message -> {
-            for (int i = 1; i <= searched.size(); i++) {
+            for (int i = 1; i <= size; i++) {
                 int finalI = i;
                 buttons.add(new BetterButton().primary("grandfather:play:option-" + i, String.valueOf(i)).onEvent(
                         channel.getGuild(), user, unused -> {},
@@ -192,11 +196,16 @@ public class PlayCommand extends DefaultMusicCommand {
                 ).build(message.getIdLong()));
             }
 
-            //if searched size is less than 5, add the del button to the buttons list
-            if (searched.size() < 5) {
-                buttons.add(del.build(message.getIdLong()));
-                message.editMessageComponents(ActionRow.of(buttons)).queue();
-            } else message.editMessageComponents(ActionRow.of(buttons), ActionRow.of(del.build(message.getIdLong()))).queue();
+            List<ActionRow> rows = new ArrayList<>();
+            int rowCount = (int) Math.ceil((double) buttons.size() / 5);
+
+            for (int i = 0; i < rowCount; i++) {
+                rows.add(ActionRow.of(buttons.subList(i * 5, Math.min(buttons.size(), (i + 1) * 5))));
+            }
+
+            rows.add(ActionRow.of(del.build(message.getIdLong()))); //delete button
+
+            message.editMessageComponents(rows).queue();
         });
     }
 

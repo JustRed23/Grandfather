@@ -1,20 +1,22 @@
 package dev.JustRed23.grandfather.utils;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
 import com.google.api.services.youtube.model.VideoContentDetails;
 import dev.JustRed23.grandfather.Bot;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 public class YoutubeUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(YoutubeUtils.class);
     private static final YouTube youTube;
 
     static {
@@ -23,7 +25,7 @@ public class YoutubeUtils {
         try {
             tmp = new YouTube.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
-                    GsonFactory.getDefaultInstance(),
+                    JacksonFactory.getDefaultInstance(),
                     null
             )
                     .setApplicationName("Grandfather#2911")
@@ -40,10 +42,10 @@ public class YoutubeUtils {
     @Nullable
     public static List<SearchResult> ytSearch(String input, long maxResults) throws IOException {
         List<SearchResult> results = youTube.search()
-                .list(Collections.singletonList("id,snippet"))
+                .list("id,snippet")
                 .setQ(input)
                 .setMaxResults(maxResults)
-                .setType(Collections.singletonList("video"))
+                .setType("video")
                 .setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)")
                 .setKey(Bot.youtube_api_key)
                 .execute()
@@ -57,8 +59,8 @@ public class YoutubeUtils {
     @Nullable
     public static List<VideoContentDetails> getVideoDetails(List<String> videoIDs) throws IOException {
         List<Video> details = youTube.videos()
-                .list(Collections.singletonList("contentDetails"))
-                .setId(videoIDs)
+                .list("contentDetails")
+                .setId(String.join(",", videoIDs))
                 .setKey(Bot.youtube_api_key)
                 .execute()
                 .getItems();
@@ -82,15 +84,29 @@ public class YoutubeUtils {
     }
 
     public static boolean isLive(String videoID) throws IOException {
-        List<Video> details = youTube.videos()
-                .list(Collections.singletonList("liveStreamingDetails"))
-                .setId(Collections.singletonList(videoID))
+        final List<Video> snippet = youTube.videos()
+                .list("snippet")
+                .setId(videoID)
                 .setKey(Bot.youtube_api_key)
                 .execute()
                 .getItems();
 
-        if (!details.isEmpty())
-            return details.get(0).getLiveStreamingDetails() != null;
+        if (!snippet.isEmpty()) {
+            final Video video = snippet.get(0);
+            if (video == null) {
+                LOGGER.error("YouTube API returned null video for ID {}", videoID);
+                return false;
+            }
+
+            final String live = video.getSnippet().getLiveBroadcastContent();
+
+            if (live == null) {
+                LOGGER.error("YouTube API returned null live status for ID {}", videoID);
+                return false;
+            }
+
+            return !live.equals("none");
+        }
 
         return false;
     }
