@@ -42,8 +42,8 @@ jobs:
 
     steps:
       - name: Generate Release Hash
-        id: vars
-        run: echo "SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        id: hash
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Create Release
         run: |
@@ -53,5 +53,5 @@ jobs:
               --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ SHA_SHORT }}
+          tag: ${{ steps.hash.outputs.sha_short }}
           jar: ${{ needs.build.outputs.GRANDFATHER_JAR }}
