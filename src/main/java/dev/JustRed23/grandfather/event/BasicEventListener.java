@@ -1,5 +1,6 @@
 package dev.JustRed23.grandfather.event;
 
+import dev.JustRed23.grandfather.App;
 import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.utils.MusicUtils;
 import dev.JustRed23.grandfather.utils.msg.ReactionHandler;
@@ -10,10 +11,15 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 public class BasicEventListener extends ListenerAdapter {
+
+    public void onReady(@NotNull ReadyEvent event) {
+        App.LOGGER.info("Bot is ready! Running version " + App.version.gitHash());
+    }
 
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         //TODO

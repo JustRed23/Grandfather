@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 
 public class App extends Application {
 
-    private static Logger LOGGER;
+    public static Logger LOGGER;
     public static GitVersion version;
     private static ShardManager shardManager;
     private DefaultShardManagerBuilder builder;
@@ -80,7 +80,9 @@ public class App extends Application {
 
         CommandHandler.init();
 
-        shardManager.getGuilds().forEach(guild -> guild.updateCommands().addCommands(CommandHandler.getCommandData()).queue());
+        shardManager.getShards().forEach(jda -> jda.updateCommands().addCommands(CommandHandler.getCommandData()).queue());
+
+        shardManager.getGuilds().forEach(guild -> guild.updateCommands().queue());
     }
 
     protected void stop() throws Exception {
