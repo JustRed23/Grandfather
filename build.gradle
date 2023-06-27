@@ -14,7 +14,7 @@ plugins {
     id 'java'
     id 'application'
     id 'net.nemerosa.versioning' version '2.14.0'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'maven-publish'
 }
 
@@ -67,26 +67,8 @@ shadowJar {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifactId = 'Grandfather'
-            artifact shadowJar
-
-            pom {
-                name = 'Grandfather'
-                description = 'A Discord bot for my servers'
-                url = 'https://github.com/JustRed23/Grandfather'
-                developers {
-                    developer {
-                        id = 'justred23'
-                        name = 'JustRed23'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:https://github.com/JustRed23/Grandfather.git'
-                    developerConnection = 'scm:git:git@github.com:JustRed23/Grandfather.git'
-                    url = 'https://github.com/JustRed23/Grandfather'
-                }
-            }
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
         }
     }
 
