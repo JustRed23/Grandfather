@@ -62,12 +62,11 @@ jobs:
 
       - name: Create Release
         run: |
+          tag=$(cat ${{ needs.build.outputs.workspace }}/hash.env)
           echo "Publishing $tag"
-          echo "${tag}"
           gh release create "$tag" build/libs/Grandfather.jar \
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
               --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ needs.build.outputs.workspace }}/hash.env
