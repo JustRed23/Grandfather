@@ -68,7 +68,25 @@ shadowJar {
 publishing {
     publications {
         shadow(MavenPublication) {
+            artifactId = 'Grandfather'
             artifact shadowJar
+
+            pom {
+                name = 'Grandfather'
+                description = 'A Discord bot for my servers'
+                url = 'https://github.com/JustRed23/Grandfather'
+                developers {
+                    developer {
+                        id = 'justred23'
+                        name = 'JustRed23'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/JustRed23/Grandfather.git'
+                    developerConnection = 'scm:git:git@github.com:JustRed23/Grandfather.git'
+                    url = 'https://github.com/JustRed23/Grandfather'
+                }
+            }
         }
     }
 
