@@ -16,12 +16,9 @@ jobs:
     permissions:
       contents: write
 
-    outputs:
-      GRANDFATHER_JAR: ${{ steps.build.outputs.jar }}
-
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           java-version: '17'
@@ -30,7 +27,7 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        uses: gradle/gradle-build-action@v2
         with:
           arguments: build
 
@@ -58,7 +55,6 @@ jobs:
     permissions:
       contents: write
 
-
     steps:
       - name: Download Build Artifact
         uses: actions/download-artifact@v3
@@ -75,7 +71,6 @@ jobs:
       - name: Create Release
         run: |
           tag=$(cat tmp/hash.env)
-          echo "Publishing $tag"
           gh release create "$tag" tmp/Grandfather.jar \
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
