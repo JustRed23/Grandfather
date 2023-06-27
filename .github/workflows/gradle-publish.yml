@@ -38,6 +38,8 @@ jobs:
       contents: write
 
     needs: build
+    env:
+      GRANDFATHER_JAR: ${{ needs.build.outputs.GRANDFATHER_JAR }}
     if: github.ref == 'refs/heads/master'
 
     steps:
@@ -47,7 +49,7 @@ jobs:
 
       - name: Create Release
         run: |
-          gh release create "$tag" './build/libs/Grandfather.jar' \
+          gh release create "$tag" ${GRANDFATHER_JAR} \
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
               --generate-notes
