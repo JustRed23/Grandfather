@@ -64,27 +64,6 @@ shadowJar {
         attributes('Implementation-Title': project.name, 'Implementation-Version': versioning.info.build)
     }
 
-    // I don't know why this is needed, but it is
-    archiveClassifier.set('')
+    // Prevent gradle from crashing and burning
     dependsOn(distTar, distZip)
-}
-
-publishing {
-    publications {
-        shadow(MavenPublication) { publication ->
-            project.shadow.component(publication)
-            version = versioning.info.build
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = "https://maven.pkg.github.com/JustRed23/Grandfather"
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
 }
