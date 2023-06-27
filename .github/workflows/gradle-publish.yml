@@ -36,7 +36,7 @@ jobs:
 
       - name: Generate Release Hash
         id: hash
-        run: echo "$(git rev-parse --short HEAD)" > tmp/hash.env
+        run: echo "$(git rev-parse --short HEAD)" > hash.env
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: hash
-          path: tmp/hash.env
+          path: hash.env
 
 
   release:
