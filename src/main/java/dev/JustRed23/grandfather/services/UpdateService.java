@@ -34,7 +34,7 @@ public class UpdateService extends Service {
                     .asFile(JarUtils.getJarFile());
 
             LOGGER.info("Updated to version " + latestTag);
-            System.exit(-2); //Pterodactyl panel detects this as a crash and will automatically try a restart
+            System.exit(-2); // Pterodactyl panel detects this as a crash and will automatically try a restart
         }
     }
 }
