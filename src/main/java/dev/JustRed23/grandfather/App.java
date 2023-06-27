@@ -10,7 +10,6 @@ import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
 import dev.JustRed23.stonebrick.version.GitVersion;
-import me.duncte123.botcommons.BotCommons;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -89,7 +88,13 @@ public class App extends Application {
         if (shardManager == null || !Bot.enabled)
             return;
         AudioPlayerManager.getInstance().shutdown();
-        BotCommons.shutdown(shardManager);
+
+        //Copied from BotCommons
+        shardManager.shutdown();
+        shardManager.getShardCache().forEach((jda) -> {
+            jda.getHttpClient().connectionPool().evictAll();
+            jda.getHttpClient().dispatcher().executorService().shutdown();
+        });
     }
 
     public static ShardManager getShardManager() {

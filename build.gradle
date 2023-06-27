@@ -35,7 +35,6 @@ def updateVersion() {
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
-    maven { url 'https://m2.duncte123.dev/releases' }
 }
 
 dependencies {
@@ -45,10 +44,13 @@ dependencies {
     //JDA
     implementation 'net.dv8tion:JDA:5.0.0-beta.11'
     implementation 'ch.qos.logback:logback-classic:1.4.8'
-    implementation 'me.duncte123:botCommons:2.3.14'
 
     //Music
-    implementation 'com.github.walkyst:lavaplayer-fork:1.4.2'
+    implementation ('com.github.walkyst:lavaplayer-fork:1.4.2') {
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+    }
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+
     implementation 'com.github.natanbc:lavadsp:4411cce'
 
     //Class handling
