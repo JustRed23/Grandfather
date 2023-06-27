@@ -36,13 +36,19 @@ jobs:
 
       - name: Generate Release Hash
         id: hash
-        run: echo "$(git rev-parse --short HEAD)" > ${{ github.workspace }}/hash.env
+        run: echo "$(git rev-parse --short HEAD)" > tmp/hash.env
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
           name: jar
           path: build/libs/Grandfather.jar
+
+      - name: Upload Hash
+        uses: actions/upload-artifact@v3
+        with:
+          name: hash
+          path: tmp/hash.env
 
 
   release:
@@ -58,13 +64,19 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: jar
-          path: build/libs
+          path: tmp
+
+      - name: Download Hash
+        uses: actions/download-artifact@v3
+        with:
+          name: hash
+          path: tmp
 
       - name: Create Release
         run: |
-          tag=$(cat ${{ needs.build.outputs.workspace }}/hash.env)
+          tag=$(cat tmp/hash.env)
           echo "Publishing $tag"
-          gh release create "$tag" build/libs/Grandfather.jar \
+          gh release create "$tag" tmp/Grandfather.jar \
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
               --generate-notes
