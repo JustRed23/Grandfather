@@ -39,10 +39,10 @@ repositories {
 
 dependencies {
     //Engine
-    implementation 'com.github.JustRed23:Stonebrick:v1.8'
+    implementation 'com.github.JustRed23:Stonebrick:v1.9'
 
     //JDA
-    implementation 'net.dv8tion:JDA:5.0.0-beta.10'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.11'
     implementation 'ch.qos.logback:logback-classic:1.4.8'
     implementation 'me.duncte123:botCommons:2.3.14'
 
