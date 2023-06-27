@@ -165,14 +165,13 @@ public class PlayCommand extends DefaultMusicCommand {
 
         for (int i = 0; i < size; i++) {
             SearchResult result = searched.get(i);
+            String time = "**" + (YoutubeUtils.isLive(result.getId().getVideoId()) ? EmojiUtils.Music.LIVE + " Live" : "(" + TimeUtils.youtubeTime(durations.get(i).getDuration()) + ")") + "**";
             stringBuilder.append("`#")
                     .append(i + 1)
                     .append(".` ")
                     .append(MarkdownSanitizer.escape(result.getSnippet().getTitle(), true))
                     .append("\n")
-                    .append("**(")
-                    .append(TimeUtils.youtubeTime(durations.get(i).getDuration()))
-                    .append(")**")
+                    .append(time)
                     .append("\n\n");
         }
 

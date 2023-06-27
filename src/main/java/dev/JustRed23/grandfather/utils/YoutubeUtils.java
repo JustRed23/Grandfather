@@ -1,7 +1,7 @@
 package dev.JustRed23.grandfather.utils;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.Video;
@@ -12,12 +12,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class YoutubeUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(YoutubeUtils.class);
     private static final YouTube youTube;
+
+    private static final Map<String, Boolean> liveVideoCache = new ConcurrentHashMap<>();
 
     static {
         YouTube tmp = null;
@@ -25,7 +30,7 @@ public class YoutubeUtils {
         try {
             tmp = new YouTube.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
-                    JacksonFactory.getDefaultInstance(),
+                    GsonFactory.getDefaultInstance(),
                     null
             )
                     .setApplicationName("Grandfather#2911")
@@ -42,10 +47,10 @@ public class YoutubeUtils {
     @Nullable
     public static List<SearchResult> ytSearch(String input, long maxResults) throws IOException {
         List<SearchResult> results = youTube.search()
-                .list("id,snippet")
+                .list(Collections.singletonList("id,snippet"))
                 .setQ(input)
                 .setMaxResults(maxResults)
-                .setType("video")
+                .setType(Collections.singletonList("video"))
                 .setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url)")
                 .setKey(Bot.youtube_api_key)
                 .execute()
@@ -59,8 +64,8 @@ public class YoutubeUtils {
     @Nullable
     public static List<VideoContentDetails> getVideoDetails(List<String> videoIDs) throws IOException {
         List<Video> details = youTube.videos()
-                .list("contentDetails")
-                .setId(String.join(",", videoIDs))
+                .list(Collections.singletonList("contentDetails"))
+                .setId(videoIDs)
                 .setKey(Bot.youtube_api_key)
                 .execute()
                 .getItems();
@@ -84,9 +89,12 @@ public class YoutubeUtils {
     }
 
     public static boolean isLive(String videoID) throws IOException {
+        if (liveVideoCache.containsKey(videoID))
+            return liveVideoCache.get(videoID);
+
         final List<Video> snippet = youTube.videos()
-                .list("snippet")
-                .setId(videoID)
+                .list(Collections.singletonList("snippet"))
+                .setId(Collections.singletonList(videoID))
                 .setKey(Bot.youtube_api_key)
                 .execute()
                 .getItems();
@@ -105,7 +113,9 @@ public class YoutubeUtils {
                 return false;
             }
 
-            return !live.equals("none");
+            boolean isLive = !live.equals("none");
+            liveVideoCache.put(videoID, isLive);
+            return isLive;
         }
 
         return false;

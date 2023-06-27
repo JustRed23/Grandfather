@@ -51,6 +51,12 @@ public class MusicUtils {
         if (userData != null)
             builder.setFooter("Requested by " + userData.getAsTag(), userData.getEffectiveAvatarUrl());
 
+        boolean live = false;
+        try {
+            if (YoutubeUtils.isLive(YoutubeUtils.getVideoID(info.uri)))
+                live = true;
+        } catch (IOException ignored) {}
+
         long timeStamp = TimeUnit.MILLISECONDS.toSeconds(track.getPosition());
 
         String uriWithTimestamp = info.uri + "&t=" + timeStamp;
@@ -59,16 +65,14 @@ public class MusicUtils {
 
         StringBuilder stringBuilder = new StringBuilder();
 
+        String time = live ? "`" + EmojiUtils.Music.LIVE + " Live`" : "`" + TimeUtils.millisToTime(track.getPosition()) + "/" + TimeUtils.millisToTime(track.getDuration()) + "`";
+
         stringBuilder
-                .append("`")
-                .append(TimeUtils.millisToTime(track.getPosition()))
-                .append("/")
-                .append(TimeUtils.millisToTime(track.getDuration()))
-                .append("`")
+                .append(time)
                 .append(guildAudioPlayer.getScheduler().isPaused() ? " " + EmojiUtils.Music.PAUSE : "")
                 .append(guildAudioPlayer.getScheduler().trackLooping() ? " " + EmojiUtils.Music.REPEAT : "");
 
-        builder.addField(EmojiUtils.makeProgressbar(TimeUnit.MILLISECONDS.toSeconds(track.getDuration()), TimeUnit.MILLISECONDS.toSeconds(track.getPosition())), stringBuilder.toString(), false);
+        builder.addField(live ? "" : EmojiUtils.makeProgressbar(TimeUnit.MILLISECONDS.toSeconds(track.getDuration()), TimeUnit.MILLISECONDS.toSeconds(track.getPosition())), stringBuilder.toString(), false);
 
         return builder;
     }
@@ -92,7 +96,7 @@ public class MusicUtils {
 
             try {
                 if (YoutubeUtils.isLive(YoutubeUtils.getVideoID(curInfo.uri)))
-                    str += System.lineSeparator() + "`" + EmojiUtils.Music.LIVE + "Live" + "`";
+                    str += System.lineSeparator() + "`" + EmojiUtils.Music.LIVE + " Live" + "`";
                 else
                     str += System.lineSeparator() + "`" + TimeUtils.millisToTime(curTrack.getPosition()) + "/" + TimeUtils.millisToTime(curTrack.getDuration()) + "`";
             } catch (IOException e) {
@@ -111,10 +115,7 @@ public class MusicUtils {
                 AudioTrack audioTrack = q.get(i);
                 AudioTrackInfo trackInfo = audioTrack.getInfo();
 
-                String info = "**" + (i + 1) + ".** " + HttpUtils.linkText(MarkdownSanitizer.escape(trackInfo.title, true), trackInfo.uri);
-                String time = "`(" + TimeUtils.millisToTime(audioTrack.getDuration()) + ")`";
-
-                builder.addField("", info + System.lineSeparator() + time,false);
+                addTrack(builder, i + 1, audioTrack, trackInfo);
             }
         } else {
             int track = (page - 1) * 5;
@@ -127,10 +128,7 @@ public class MusicUtils {
                 AudioTrack audioTrack = q.get(track - 1);
                 AudioTrackInfo trackInfo = audioTrack.getInfo();
 
-                String info = "**" + track + ".** " + HttpUtils.linkText(MarkdownSanitizer.escape(trackInfo.title, true), trackInfo.uri);
-                String time = "`(" + TimeUtils.millisToTime(audioTrack.getDuration()) + ")`";
-
-                builder.addField("", info + System.lineSeparator() + time,false);
+                addTrack(builder, track, audioTrack, trackInfo);
                 track++;
             }
         }
@@ -141,6 +139,18 @@ public class MusicUtils {
         builder.setFooter("Page " + page + " of " + totalPages);
 
         return builder;
+    }
+
+    private static void addTrack(EmbedBuilder builder, int trackNum, AudioTrack audioTrack, AudioTrackInfo trackInfo) {
+        String info = "**" + trackNum + ".** " + HttpUtils.linkText(MarkdownSanitizer.escape(trackInfo.title, true), trackInfo.uri);
+        String time = "`(" + TimeUtils.millisToTime(audioTrack.getDuration()) + ")`";
+
+        try {
+            if (YoutubeUtils.isLive(YoutubeUtils.getVideoID(trackInfo.uri)))
+                time = "`" + EmojiUtils.Music.LIVE + " Live" + "`";
+        } catch (IOException ignored) {}
+
+        builder.addField("", info + System.lineSeparator() + time,false);
     }
 
     public static int getPage(long msgID) {

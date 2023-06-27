@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.JustRed23.grandfather.bettertemplate.Templates;
+import dev.JustRed23.grandfather.utils.EmojiUtils;
 import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.grandfather.utils.YoutubeUtils;
 import dev.JustRed23.grandfather.utils.msg.EmbedUtils;
@@ -18,6 +19,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +90,15 @@ public class AudioPlayerManager {
                     builder.setAuthor("Added to queue", null, user.getEffectiveAvatarUrl());
 
                     builder.addField("Channel name", info.author, true);
-                    builder.addField("Song duration", TimeUtils.millisToTime(track.getDuration()), true);
+
+                    String time = TimeUtils.millisToTime(track.getDuration());
+
+                    try {
+                        if (YoutubeUtils.isLive(YoutubeUtils.getVideoID(info.uri)))
+                            time = EmojiUtils.Music.LIVE + " Live";
+                    } catch (IOException ignored) {}
+
+                    builder.addField("Song duration", time, true);
                     builder.addField("Position in queue", String.valueOf(musicManager.getScheduler().getQueue().size()), false);
                 }
 
