@@ -63,6 +63,10 @@ shadowJar {
     manifest {
         attributes('Implementation-Title': project.name, 'Implementation-Version': versioning.info.build)
     }
+
+    // I don't know why this is needed, but it is
+    archiveClassifier.set('')
+    dependsOn(distTar, distZip)
 }
 
 publishing {
