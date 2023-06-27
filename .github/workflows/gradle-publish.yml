@@ -34,12 +34,6 @@ jobs:
         with:
           arguments: build
 
-      - name: Verify Files
-        run: |
-          ls -la
-          ls -la build/libs
-          ls -la build/libs/Grandfather.jar
-
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -68,7 +62,7 @@ jobs:
 
       - name: Create Release
         run: |
-          gh release create "$tag" .build/libs/Grandfather.jar \
+          gh release create "$tag" build/libs/Grandfather.jar \
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
               --generate-notes
