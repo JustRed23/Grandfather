@@ -5,6 +5,7 @@ import dev.JustRed23.grandfather.command.handler.CommandHandler;
 import dev.JustRed23.grandfather.event.BasicEventListener;
 import dev.JustRed23.grandfather.music.AudioPlayerManager;
 import dev.JustRed23.grandfather.services.InactivityService;
+import dev.JustRed23.grandfather.services.UpdateService;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
@@ -60,6 +61,7 @@ public class App extends Application {
                 .setActivity(getDefaultActivity());
 
         getServicePool().addService(InactivityService.class);
+        getServicePool().addService(UpdateService.class);
     }
 
     public static Activity getDefaultActivity() {
