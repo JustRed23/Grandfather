@@ -67,7 +67,7 @@ shadowJar {
 
 publishing {
     publications {
-        shadow(MavenPublication) {
+        mavenJava(MavenPublication) {
             artifactId = 'Grandfather'
             artifact shadowJar
 
