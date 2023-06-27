@@ -38,8 +38,6 @@ jobs:
       contents: write
 
     needs: build
-    env:
-      GRANDFATHER_JAR: ${{ needs.build.outputs.GRANDFATHER_JAR }}
     if: github.ref == 'refs/heads/master'
 
     steps:
@@ -49,10 +47,11 @@ jobs:
 
       - name: Create Release
         run: |
-          gh release create "$tag" ${GRANDFATHER_JAR} \
+          gh release create "$tag" "$jar" \
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
               --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${SHA_SHORT}
+          tag: ${{ SHA_SHORT }}
+          jar: ${{ needs.build.outputs.GRANDFATHER_JAR }}
