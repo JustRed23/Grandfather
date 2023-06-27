@@ -34,11 +34,17 @@ jobs:
         with:
           arguments: build
 
+      - name: Verify Files
+        run: |
+          ls -la
+          ls -la build/libs
+          ls -la build/libs/Grandfather.jar
+
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
           name: jar
-          path: .build/libs/Grandfather.jar
+          path: build/libs/Grandfather.jar
 
 
   release:
@@ -54,7 +60,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: jar
-          path: .build/libs
+          path: build/libs
 
       - name: Generate Release Hash
         id: hash
