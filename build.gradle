@@ -69,6 +69,12 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             artifact shadowJar
+
+            pom {
+                name = 'Grandfather'
+                description = 'A Discord bot written in Java using JDA'
+                url = 'https://github.com/JustRed23/Grandfather'
+            }
         }
     }
 
