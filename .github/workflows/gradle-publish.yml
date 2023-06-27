@@ -36,7 +36,7 @@ jobs:
 
       - name: Generate Release Hash
         id: hash
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+        run: echo "sha_short=$(git rev-parse --short HEAD)" > ${{ github.workspace }}/hash.env
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
@@ -68,4 +68,4 @@ jobs:
               --generate-notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ jobs.build.hash.outputs.sha_short }}
+          tag: ${{ needs.build.outputs.workspace }}/hash.env
