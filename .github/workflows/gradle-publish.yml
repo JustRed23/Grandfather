@@ -16,6 +16,9 @@ jobs:
     permissions:
       contents: write
 
+    outputs:
+      GRANDFATHER_JAR: ${{ steps.build.outputs.jar }}
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -33,12 +36,12 @@ jobs:
 
 
   release:
+    needs: build
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
     permissions:
       contents: write
 
-    needs: build
-    if: github.ref == 'refs/heads/master'
 
     steps:
       - name: Generate Release Hash
@@ -47,6 +50,7 @@ jobs:
 
       - name: Create Release
         run: |
+          ls &&
           gh release create "$tag" "$jar" \
               --repo="$GITHUB_REPOSITORY" \
               --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
