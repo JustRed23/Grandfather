@@ -43,7 +43,7 @@ dependencies {
 
     //JDA
     implementation 'net.dv8tion:JDA:5.0.0-beta.12'
-    implementation 'ch.qos.logback:logback-classic:1.4.8'
+    implementation 'ch.qos.logback:logback-classic:1.4.9'
 
     //Music
     implementation ('com.github.walkyst:lavaplayer-fork:1.4.2') {
