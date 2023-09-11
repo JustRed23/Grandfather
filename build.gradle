@@ -57,7 +57,7 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
 
     //Youtube Data API
-    implementation 'com.google.apis:google-api-services-youtube:v3-rev20230816-2.0.0'
+    implementation 'com.google.apis:google-api-services-youtube:v3-rev20230904-2.0.0'
 }
 
 shadowJar {
