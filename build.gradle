@@ -39,7 +39,7 @@ repositories {
 
 dependencies {
     //Engine
-    implementation 'com.github.JustRed23:Stonebrick:v1.9'
+    implementation 'com.github.JustRed23:Stonebrick:v1.9.1'
 
     //JDA
     implementation 'net.dv8tion:JDA:5.0.0-beta.15'
@@ -49,7 +49,7 @@ dependencies {
     implementation ('dev.arbjerg:lavaplayer:2.0.2') {
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
     }
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.3'
 
     implementation 'com.github.natanbc:lavadsp:4411cce'
 
@@ -57,7 +57,7 @@ dependencies {
     implementation 'org.reflections:reflections:0.10.2'
 
     //Youtube Data API
-    implementation 'com.google.apis:google-api-services-youtube:v3-rev20230904-2.0.0'
+    implementation 'com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0'
 }
 
 shadowJar {
