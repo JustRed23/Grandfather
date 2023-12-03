@@ -11,5 +11,6 @@ public enum CheckTypes {
     NOT_PLAYING,
     SUCCESS,
     SUPPRESSED_FAIL,
+    BLOCKED_USER,
     USER_NOT_CONNECTED
 }

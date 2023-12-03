@@ -44,7 +44,8 @@ public final class Templates {
                 resumed = new UnformattedTemplate("%s The track has been resumed", INFO, false).format(EmojiUtils.Music.PLAY),
                 restart = new UnformattedTemplate("%s Replaying track", INFO, false).format(EmojiUtils.Music.REPEAT),
                 previous_track = new UnformattedTemplate("%s Went back to the previous track", INFO, false).format(EmojiUtils.Music.PREV_TRACK),
-                next_track = new UnformattedTemplate("%s Skipped", INFO, false).format(EmojiUtils.Music.NEXT_TRACK);
+                next_track = new UnformattedTemplate("%s Skipped", INFO, false).format(EmojiUtils.Music.NEXT_TRACK),
+                blocked_user = new UnformattedTemplate("%s This user has been blocked from using music commands", ERROR, false).format(EmojiUtils.General.NO);
 
         public static final UnformattedTemplate
                 joined = new UnformattedTemplate("%s Successfully joined %s `%s` and bound to %s", INFO, false).formatRaw(EmojiUtils.General.YES, EmojiUtils.Music.SPEAKER),

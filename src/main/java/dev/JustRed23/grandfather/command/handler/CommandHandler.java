@@ -102,6 +102,7 @@ public final class CommandHandler {
             case IN_DIFFERENT_CHANNEL -> Templates.Music.in_different_channel.embed(event);
             case NOT_PLAYING -> Templates.Music.not_playing.embed(event);
             case EMPTY_QUEUE -> Templates.Music.empty_queue.embed(event);
+            case BLOCKED_USER -> Templates.Music.blocked_user.embed(event);
             case SUCCESS -> command.execute(context);
         }
     }
@@ -153,6 +154,7 @@ public final class CommandHandler {
             case IN_DIFFERENT_CHANNEL -> Templates.Music.in_different_channel.embed(event);
             case NOT_PLAYING -> Templates.Music.not_playing.embed(event);
             case EMPTY_QUEUE -> Templates.Music.empty_queue.embed(event);
+            case BLOCKED_USER -> Templates.Music.blocked_user.embed(event);
             case SUCCESS -> {
                 event.getChannel().sendTyping().queue();
                 assert command != null;
