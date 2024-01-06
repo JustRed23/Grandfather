@@ -61,9 +61,6 @@ public class CommandChecker {
             return BOT_NO_PERMISSION;
 
         if (command instanceof DefaultMusicCommand defaultMusicCommand) {
-            if (u.getIdLong() == 527593263067168770L)
-                return BLOCKED_USER;
-
             MusicManager manager = AudioPlayerManager.getInstance().getMusicManager(channel.getGuild());
 
             if (manager.getScheduler().getChannel() != null && !manager.getScheduler().isSameChannel(channel))
