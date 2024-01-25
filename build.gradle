@@ -49,7 +49,7 @@ dependencies {
     implementation ('dev.arbjerg:lavaplayer:2.1.0') {
         exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
     }
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.1'
 
     implementation 'com.github.natanbc:lavadsp:4411cce'
 
