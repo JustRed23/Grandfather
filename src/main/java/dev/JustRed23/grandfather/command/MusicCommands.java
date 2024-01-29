@@ -152,6 +152,20 @@ public class MusicCommands {
                 .setGuildOnly()
                 .buildAndRegister();
 
+        JDAUtilities.createSlashCommand("nowplaying", "Shows the currently playing song")
+                .addAlias("np")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    final TrackInfo current = AudioManager.get(event.getGuild()).getScheduler().getPlayingTrackInfo();
+                    if (current == null)
+                        event.reply("There is no song currently playing!").queue();
+                    else
+                        event.reply("Currently playing " + current.track().getInfo().title + " by " + current.track().getInfo().author).queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
         JDAUtilities.createSlashCommand("seek", "Seeks to a position in the current song")
                 .addAlias("goto")
                 .addOption(new CommandOption(OptionType.INTEGER, "minutes", "The amount of minutes to seek", false))
