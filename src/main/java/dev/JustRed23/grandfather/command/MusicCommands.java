@@ -64,6 +64,7 @@ public class MusicCommands {
     //TODO: use embeds and stuff to make it more nice
     public static void register() {
         JDAUtilities.createSlashCommand("play", "Plays a song")
+                .addAlias("p")
                 .addOption(
                         new CommandOption(OptionType.STRING, "query", "A search query or URL", true, true)
                                 .onAutoComplete(event -> {
@@ -113,10 +114,11 @@ public class MusicCommands {
                         }
                     });
                 })
-                .modifyData(data -> data.setGuildOnly(true))
+                .setGuildOnly()
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("skip", "Skips the current song")
+                .addAlias("s")
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(event -> {
@@ -133,7 +135,7 @@ public class MusicCommands {
                     else
                         event.reply("Skipped to " + next.track().getInfo().title + " by " + next.track().getInfo().author).queue();
                 })
-                .modifyData(data -> data.setGuildOnly(true))
+                .setGuildOnly()
                 .buildAndRegister();
     }
 }
