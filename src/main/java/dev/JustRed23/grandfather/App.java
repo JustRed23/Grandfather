@@ -1,6 +1,7 @@
 package dev.JustRed23.grandfather;
 
 import dev.JustRed23.abcm.Config;
+import dev.JustRed23.grandfather.command.MusicCommands;
 import dev.JustRed23.grandfather.services.UpdateService;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.settings.DefaultGuildSettingManager;
@@ -58,6 +59,8 @@ public class App extends Application {
                 .setActivity(getDefaultActivity());
 
         getServicePool().addService(UpdateService.class);
+
+        MusicCommands.register();
     }
 
     public static Activity getDefaultActivity() {

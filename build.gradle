@@ -43,13 +43,10 @@ dependencies {
 
     //JDA
     implementation 'net.dv8tion:JDA:5.0.0-beta.20'
-    implementation 'com.github.JustRed23:JDA-Utilities:1.6'
+    implementation 'com.github.JustRed23:JDA-Utilities:1.8'
 
     //Logging
     implementation 'ch.qos.logback:logback-classic:1.4.14'
-
-    //Class handling
-    implementation 'org.reflections:reflections:0.10.2'
 }
 
 shadowJar {
