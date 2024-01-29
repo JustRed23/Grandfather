@@ -14,6 +14,7 @@ import dev.JustRed23.jdautils.music.TrackLoadCallback;
 import dev.JustRed23.jdautils.music.search.Search;
 import dev.JustRed23.jdautils.music.search.YouTubeSource;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.io.IOException;
@@ -117,6 +118,63 @@ public class MusicCommands {
                 .setGuildOnly()
                 .buildAndRegister();
 
+        JDAUtilities.createSlashCommand("pause", "Pauses the current song")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(event -> {
+                    if (!AudioManager.get(event.getGuild()).getScheduler().isPaused()) {
+                        event.reply("The bot is already paused!").setEphemeral(true).queue();
+                        return false;
+                    }
+                    return true;
+                })
+                .executes(event -> {
+                    AudioManager.get(event.getGuild()).getControls().pause();
+                    event.reply("Paused").queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("resume", "Resumes the current song")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(event -> {
+                    if (!AudioManager.get(event.getGuild()).getScheduler().isPaused()) {
+                        event.reply("The bot is not paused!").setEphemeral(true).queue();
+                        return false;
+                    }
+                    return true;
+                })
+                .executes(event -> {
+                    AudioManager.get(event.getGuild()).getControls().resume();
+                    event.reply("Resumed").queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("seek", "Seeks to a position in the current song")
+                .addAlias("goto")
+                .addOption(new CommandOption(OptionType.INTEGER, "minutes", "The amount of minutes to seek", false))
+                .addOption(new CommandOption(OptionType.INTEGER, "seconds", "The amount of seconds to seek", false))
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    final OptionMapping minutes = event.getOption("minutes");
+                    final OptionMapping seconds = event.getOption("seconds");
+                    int m = minutes != null ? minutes.getAsInt() : 0;
+                    int s = seconds != null ? seconds.getAsInt() : 0;
+                    int ms = ((m * 60) + s) * 1000;
+
+                    if (ms <= 0) {
+                        event.reply("You must specify a valid time to seek to!").setEphemeral(true).queue();
+                        return;
+                    }
+
+                    AudioManager.get(event.getGuild()).getControls().seek(ms);
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
         JDAUtilities.createSlashCommand("skip", "Skips the current song")
                 .addAlias("s")
                 .addCondition(IN_VOICE_CHANNEL)
@@ -134,6 +192,40 @@ public class MusicCommands {
                         event.reply("There are no more songs in the queue, stopped playing").queue();
                     else
                         event.reply("Skipped to " + next.track().getInfo().title + " by " + next.track().getInfo().author).queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("prev", "Goes back to the previous song")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    final TrackInfo prev = AudioManager.get(event.getGuild()).getControls().prev();
+                    if (prev == null)
+                        event.reply("There are no more songs in the queue, stopped playing").queue();
+                    else
+                        event.reply("Went back to " + prev.track().getInfo().title + " by " + prev.track().getInfo().author).queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("stop", "Stops playing music")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    AudioManager.get(event.getGuild()).getControls().stop();
+                    event.reply("Stopped playing").queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("disconnect", "Disconnects the bot from the voice channel")
+                .addAlias("dc")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    AudioManager.get(event.getGuild()).disconnect();
+                    event.reply("Disconnected").queue();
                 })
                 .setGuildOnly()
                 .buildAndRegister();
