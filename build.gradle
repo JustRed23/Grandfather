@@ -42,22 +42,14 @@ dependencies {
     implementation 'com.github.JustRed23:Stonebrick:v1.9.1'
 
     //JDA
-    implementation 'net.dv8tion:JDA:5.0.0-beta.18'
-    implementation 'ch.qos.logback:logback-classic:1.4.12'
+    implementation 'net.dv8tion:JDA:5.0.0-beta.20'
+    implementation 'com.github.JustRed23:JDA-Utilities:1.6'
 
-    //Music
-    implementation ('dev.arbjerg:lavaplayer:2.0.3') {
-        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
-    }
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.16.0'
-
-    implementation 'com.github.natanbc:lavadsp:4411cce'
+    //Logging
+    implementation 'ch.qos.logback:logback-classic:1.4.14'
 
     //Class handling
     implementation 'org.reflections:reflections:0.10.2'
-
-    //Youtube Data API
-    implementation 'com.google.apis:google-api-services-youtube:v3-rev20231011-2.0.0'
 }
 
 shadowJar {

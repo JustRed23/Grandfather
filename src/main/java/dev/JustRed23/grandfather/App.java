@@ -1,11 +1,9 @@
 package dev.JustRed23.grandfather;
 
 import dev.JustRed23.abcm.Config;
-import dev.JustRed23.grandfather.command.handler.CommandHandler;
-import dev.JustRed23.grandfather.event.BasicEventListener;
-import dev.JustRed23.grandfather.music.AudioPlayerManager;
-import dev.JustRed23.grandfather.services.InactivityService;
 import dev.JustRed23.grandfather.services.UpdateService;
+import dev.JustRed23.jdautils.JDAUtilities;
+import dev.JustRed23.jdautils.settings.DefaultGuildSettingManager;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
@@ -27,10 +25,10 @@ public class App extends Application {
     private static ShardManager shardManager;
     private DefaultShardManagerBuilder builder;
 
-    protected void init() throws Exception {
+    protected void init() {
         LOGGER = SBLogger.getLogger(Bot.name);
         version = GitVersion.fromFile(getClass().getClassLoader().getResourceAsStream("application.properties"));
-        FileStructure.discover(GFS.class);
+        FileStructure.disable();
         builder = DefaultShardManagerBuilder.createDefault(Bot.token)
                 .setBulkDeleteSplittingEnabled(false)
                 .setEnableShutdownHook(false)
@@ -59,7 +57,6 @@ public class App extends Application {
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(getDefaultActivity());
 
-        getServicePool().addService(InactivityService.class);
         getServicePool().addService(UpdateService.class);
     }
 
@@ -67,7 +64,7 @@ public class App extends Application {
         return Activity.watching("TV");
     }
 
-    protected void start() throws Exception {
+    protected void start() {
         if (!Bot.enabled) {
             LOGGER.info("Bot is disabled. Exiting...");
             exit();
@@ -75,19 +72,12 @@ public class App extends Application {
         }
 
         shardManager = builder.build();
-        shardManager.addEventListener(new BasicEventListener());
-
-        CommandHandler.init();
-
-        shardManager.getShards().forEach(jda -> jda.updateCommands().addCommands(CommandHandler.getCommandData()).queue());
-
-        shardManager.getGuilds().forEach(guild -> guild.updateCommands().queue());
+        shardManager.addEventListener(JDAUtilities.getInstance().withGuildSettingManager(new DefaultGuildSettingManager()).listener());
     }
 
-    protected void stop() throws Exception {
+    protected void stop() {
         if (shardManager == null || !Bot.enabled)
             return;
-        AudioPlayerManager.getInstance().shutdown();
 
         //Copied from BotCommons
         shardManager.shutdown();

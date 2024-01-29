@@ -6,7 +6,7 @@ import dev.JustRed23.abcm.Configurable;
 @Configurable
 public class Bot {
 
-    public static final long start_time = System.currentTimeMillis();
+    public static final long START_TIME = System.currentTimeMillis();
 
     @ConfigField(defaultValue = "false")
     public static boolean enabled;
@@ -14,17 +14,11 @@ public class Bot {
     @ConfigField(defaultValue = "true")
     public static boolean auto_update;
 
-    @ConfigField(defaultValue = "false")
-    public static boolean show_unknown_command_message;
-
     @ConfigField(defaultValue = "Grandfather")
     public static String name;
 
     @ConfigField(defaultValue = "2911")
     public static String tag;
-
-    @ConfigField(defaultValue = "g!")
-    public static String prefix;
 
     @ConfigField(defaultValue = "https://github.com/JustRed23/Grandfather")
     public static String website_url;
