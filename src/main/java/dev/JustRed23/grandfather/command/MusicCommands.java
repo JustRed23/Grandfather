@@ -52,20 +52,34 @@ public class MusicCommands {
         return true;
     };
 
+    private static final Function<SlashCommandInteractionEvent, Boolean> BOT_NOT_PLAYING = event -> {
+        if (!AudioManager.get(event.getGuild()).isConnected()) {
+            event.reply("The bot is not playing music!").setEphemeral(true).queue();
+            return false;
+        }
+
+        return true;
+    };
+
+    //TODO: use embeds and stuff to make it more nice
     public static void register() {
         JDAUtilities.createSlashCommand("play", "Plays a song")
                 .addOption(
                         new CommandOption(OptionType.STRING, "query", "A search query or URL", true, true)
                                 .onAutoComplete(event -> {
                                     final String value = event.getFocusedOption().getValue();
-                                    if (value.isBlank() || HttpUtils.isUrl(value))
+                                    if (value.isBlank() || HttpUtils.isUrl(value)) {
+                                        event.replyChoices(List.of()).queue();
                                         return;
+                                    }
 
                                     final List<SearchResult> search;
                                     try {
                                         search = YT.search(value);
                                     } catch (IOException e) {
-                                        throw new RuntimeException(e);
+                                        event.replyChoices(List.of()).queue();
+                                        e.printStackTrace();
+                                        return;
                                     }
 
                                     final List<String> titles = search.stream().map(s -> s.getSnippet().getTitle()).toList();
@@ -82,7 +96,6 @@ public class MusicCommands {
                     if (!HttpUtils.isUrl(query)) query = "ytsearch:" + query;
 
                     audioManager.loadAndPlay(query, event.getMember(), new TrackLoadCallback() {
-                        //TODO: use embeds and stuff to make it more nice
                         public void onTrackLoaded(TrackInfo trackInfo, boolean addedToQueue, long durationMs) {
                             event.reply("Added " + trackInfo.track().getInfo().title + " by " + trackInfo.track().getInfo().author + " to the queue").queue();
                         }
@@ -99,6 +112,26 @@ public class MusicCommands {
                             event.reply("Could not load track: " + exception.getMessage()).queue();
                         }
                     });
+                })
+                .modifyData(data -> data.setGuildOnly(true))
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("skip", "Skips the current song")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(event -> {
+                    if (!AudioManager.get(event.getGuild()).getScheduler().isPlaying() && AudioManager.get(event.getGuild()).getScheduler().getQueue().isEmpty()) {
+                        event.reply("There are no songs in the queue!").setEphemeral(true).queue();
+                        return false;
+                    }
+                    return true;
+                })
+                .executes(event -> {
+                    final TrackInfo next = AudioManager.get(event.getGuild()).getControls().skip();
+                    if (next == null)
+                        event.reply("There are no more songs in the queue, stopped playing").queue();
+                    else
+                        event.reply("Skipped to " + next.track().getInfo().title + " by " + next.track().getInfo().author).queue();
                 })
                 .modifyData(data -> data.setGuildOnly(true))
                 .buildAndRegister();
