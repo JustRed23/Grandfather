@@ -152,43 +152,6 @@ public class MusicCommands {
                 .setGuildOnly()
                 .buildAndRegister();
 
-        JDAUtilities.createSlashCommand("nowplaying", "Shows the currently playing song")
-                .addAlias("np")
-                .addCondition(IN_VOICE_CHANNEL)
-                .addCondition(BOT_NOT_PLAYING)
-                .executes(event -> {
-                    final TrackInfo current = AudioManager.get(event.getGuild()).getScheduler().getPlayingTrackInfo();
-                    if (current == null)
-                        event.reply("There is no song currently playing!").queue();
-                    else
-                        event.reply("Currently playing " + current.track().getInfo().title + " by " + current.track().getInfo().author).queue();
-                })
-                .setGuildOnly()
-                .buildAndRegister();
-
-        JDAUtilities.createSlashCommand("seek", "Seeks to a position in the current song")
-                .addAlias("goto")
-                .addOption(new CommandOption(OptionType.INTEGER, "minutes", "The amount of minutes to seek", false))
-                .addOption(new CommandOption(OptionType.INTEGER, "seconds", "The amount of seconds to seek", false))
-                .addCondition(IN_VOICE_CHANNEL)
-                .addCondition(BOT_NOT_PLAYING)
-                .executes(event -> {
-                    final OptionMapping minutes = event.getOption("minutes");
-                    final OptionMapping seconds = event.getOption("seconds");
-                    int m = minutes != null ? minutes.getAsInt() : 0;
-                    int s = seconds != null ? seconds.getAsInt() : 0;
-                    int ms = ((m * 60) + s) * 1000;
-
-                    if (ms <= 0) {
-                        event.reply("You must specify a valid time to seek to!").setEphemeral(true).queue();
-                        return;
-                    }
-
-                    AudioManager.get(event.getGuild()).getControls().seek(ms);
-                })
-                .setGuildOnly()
-                .buildAndRegister();
-
         JDAUtilities.createSlashCommand("skip", "Skips the current song")
                 .addAlias("s")
                 .addCondition(IN_VOICE_CHANNEL)
@@ -243,5 +206,55 @@ public class MusicCommands {
                 })
                 .setGuildOnly()
                 .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("seek", "Seeks to a position in the current song")
+                .addAlias("goto")
+                .addOption(new CommandOption(OptionType.INTEGER, "minutes", "The amount of minutes to seek", false))
+                .addOption(new CommandOption(OptionType.INTEGER, "seconds", "The amount of seconds to seek", false))
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    final OptionMapping minutes = event.getOption("minutes");
+                    final OptionMapping seconds = event.getOption("seconds");
+                    int m = minutes != null ? minutes.getAsInt() : 0;
+                    int s = seconds != null ? seconds.getAsInt() : 0;
+                    int ms = ((m * 60) + s) * 1000;
+
+                    if (ms <= 0) {
+                        event.reply("You must specify a valid time to seek to!").setEphemeral(true).queue();
+                        return;
+                    }
+
+                    AudioManager.get(event.getGuild()).getControls().seek(ms);
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        //TODO: volume
+        //TODO: queue
+        //TODO: shuffle
+        //TODO: loop/repeat
+
+        //TODO: optional - lyrics
+        //TODO: optional - playlist
+
+        //TODO: remove
+        //TODO: effect
+
+        JDAUtilities.createSlashCommand("nowplaying", "Shows the currently playing song")
+                .addAlias("np")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    final TrackInfo current = AudioManager.get(event.getGuild()).getScheduler().getPlayingTrackInfo();
+                    if (current == null)
+                        event.reply("There is no song currently playing!").queue();
+                    else
+                        event.reply("Currently playing " + current.track().getInfo().title + " by " + current.track().getInfo().author).queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        //TODO: stats
     }
 }
