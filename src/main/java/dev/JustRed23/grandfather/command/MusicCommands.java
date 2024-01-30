@@ -4,6 +4,7 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.ex.ErrorHandler;
 import dev.JustRed23.grandfather.utils.HttpUtils;
@@ -21,6 +22,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ConcurrentModificationException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -58,6 +61,15 @@ public class MusicCommands {
     private static final Function<SlashCommandInteractionEvent, Boolean> BOT_NOT_PLAYING = event -> {
         if (!AudioManager.get(event.getGuild()).isConnected()) {
             event.reply("The bot is not playing music!").setEphemeral(true).queue();
+            return false;
+        }
+
+        return true;
+    };
+
+    private static final Function<SlashCommandInteractionEvent, Boolean> EMPTY_QUEUE = event -> {
+        if (AudioManager.get(event.getGuild()).getScheduler().getQueue().isEmpty()) {
+            event.reply("The queue is empty!").setEphemeral(true).queue();
             return false;
         }
 
@@ -259,15 +271,96 @@ public class MusicCommands {
                 .setGuildOnly()
                 .buildAndRegister();
 
-        //TODO: queue
-        //TODO: shuffle
-        //TODO: loop/repeat
+        JDAUtilities.createSlashCommand("queue", "Shows the current queue")
+                .addAlias("q")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(EMPTY_QUEUE)
+                .executes(event -> {
+                    //concurrency
+                    final LinkedList<AudioTrack> queue = new LinkedList<>(AudioManager.get(event.getGuild()).getScheduler().getQueue());
+
+                    final StringBuilder builder = new StringBuilder();
+                    builder.append("Current queue:\n");
+                    for (int i = 0; i < queue.size(); i++) {
+                        final AudioTrack track = queue.get(i);
+                        builder.append(i + 1).append(". ").append(track.getInfo().title).append(" by ").append(track.getInfo().author).append("\n");
+                    }
+
+                    event.reply(builder.toString()).queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("clear", "Clears the current queue")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(EMPTY_QUEUE)
+                .executes(event -> {
+                    AudioManager.get(event.getGuild()).getScheduler().getQueue().clear();
+                    event.reply("Cleared the queue").queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("shuffle", "Shuffles the current queue")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(EMPTY_QUEUE)
+                .executes(event -> {
+                    AudioManager.get(event.getGuild()).getScheduler().shuffle();
+                    event.reply("Shuffled the queue").queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("loop", "Loops the current song")
+                .addAlias("repeat")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    final AudioManager audioManager = AudioManager.get(event.getGuild());
+                    boolean looping = audioManager.getControls().loop();
+                    event.reply("Looping is now " + (looping ? "enabled" : "disabled")).queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("remove", "Removes a song from the queue")
+                .addAlias("rm")
+                .addOption(new CommandOption(OptionType.INTEGER, "index", "The index of the song to remove", true))
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(EMPTY_QUEUE)
+                .executes(event -> {
+                    int index = event.getOption("index").getAsInt();
+                    index--;
+
+                    final LinkedList<AudioTrack> queue = AudioManager.get(event.getGuild()).getScheduler().getQueue();
+
+                    if (index < 0 || index >= queue.size()) {
+                        event.reply("The index must be between 1 and " + queue.size()).setEphemeral(true).queue();
+                        return;
+                    }
+
+                    final AudioTrack track = queue.get(index);
+
+                    try {
+                        queue.remove(index);
+                    } catch (ConcurrentModificationException c) {
+                        event.reply("An error occurred while removing the song from the queue, please try again").setEphemeral(true).queue();
+                        ErrorHandler.handleException("queue-remove", c);
+                        return;
+                    }
+
+                    event.reply("Removed " + track.getInfo().title + " by " + track.getInfo().author + " from the queue").queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
 
         //TODO: optional - lyrics
         //TODO: optional - playlist
-
-        //TODO: remove
-        //TODO: effect
+        //TODO: optional - effect
 
         JDAUtilities.createSlashCommand("nowplaying", "Shows the currently playing song")
                 .addAlias("np")
