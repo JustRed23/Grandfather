@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import dev.JustRed23.grandfather.Bot;
+import dev.JustRed23.grandfather.ex.ErrorHandler;
 import dev.JustRed23.grandfather.utils.HttpUtils;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.CommandOption;
@@ -13,6 +14,7 @@ import dev.JustRed23.jdautils.music.TrackInfo;
 import dev.JustRed23.jdautils.music.TrackLoadCallback;
 import dev.JustRed23.jdautils.music.search.Search;
 import dev.JustRed23.jdautils.music.search.YouTubeSource;
+import dev.JustRed23.jdautils.settings.ConfigReturnValue;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -80,7 +82,7 @@ public class MusicCommands {
                                         search = YT.search(value);
                                     } catch (IOException e) {
                                         event.replyChoices(List.of()).queue();
-                                        e.printStackTrace();
+                                        ErrorHandler.handleException("youtube-search-request", e);
                                         return;
                                     }
 
@@ -230,7 +232,33 @@ public class MusicCommands {
                 .setGuildOnly()
                 .buildAndRegister();
 
-        //TODO: volume
+        JDAUtilities.createSlashCommand("volume", "Sets the volume of the bot")
+                .addAlias("vol")
+                .addOption(new CommandOption(OptionType.INTEGER, "volume", "The volume to set"))
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .executes(event -> {
+                    final OptionMapping volume = event.getOption("volume");
+                    if (volume == null) {
+                        event.reply("The current volume is " + AudioManager.get(event.getGuild()).getAudioModifier().getVolume()).queue();
+                        return;
+                    }
+
+                    final int vol = volume.getAsInt();
+                    final ConfigReturnValue val = AudioManager.get(event.getGuild()).getAudioModifier().setVolume(vol);
+                    if (val == ConfigReturnValue.INVALID_VALUE) {
+                        event.reply("The volume must be between 0 and 100!").setEphemeral(true).queue();
+                        return;
+                    }
+
+                    if (val == ConfigReturnValue.ERROR)
+                        ErrorHandler.handleException("db-change-volume", val.getException());
+
+                    event.reply("Set the volume to " + vol).queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
         //TODO: queue
         //TODO: shuffle
         //TODO: loop/repeat
