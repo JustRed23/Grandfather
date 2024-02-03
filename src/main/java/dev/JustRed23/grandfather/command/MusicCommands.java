@@ -17,6 +17,7 @@ import dev.JustRed23.jdautils.music.TrackLoadCallback;
 import dev.JustRed23.jdautils.music.search.Search;
 import dev.JustRed23.jdautils.music.search.YouTubeSource;
 import dev.JustRed23.jdautils.settings.ConfigReturnValue;
+import dev.JustRed23.jdautils.settings.Setting;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -77,10 +78,47 @@ public class MusicCommands {
         return true;
     };
 
+    private static boolean cacheIsUpToDate = false;
+    private static final List<Long> knownBannedUsers = new LinkedList<>();
+
+    private static final Function<SlashCommandInteractionEvent, Boolean> NOT_BANNED = event -> {
+        if (!cacheIsUpToDate) {
+            knownBannedUsers.clear();
+
+            final Setting bannedUsers = JDAUtilities.getGuildSettingManager().getOrDefault(event.getGuild().getIdLong(), "music_banned_users", "");
+
+            if (bannedUsers.stringValue().isBlank()) {
+                cacheIsUpToDate = true;
+                return true;
+            }
+
+            for (String s : bannedUsers.stringValue().split(",")) {
+                if (s.isBlank()) continue;
+                knownBannedUsers.add(Long.parseLong(s));
+            }
+
+            cacheIsUpToDate = true;
+        }
+
+        if (knownBannedUsers.isEmpty()) return true;
+
+        if (knownBannedUsers.contains(event.getMember().getIdLong())) {
+            event.reply("You are currently banned from using music commands!").queue();
+            return false;
+        }
+        return true;
+    };
+
+    public static void clearKnownBannedUsers() {
+        cacheIsUpToDate = false;
+    }
+
     //TODO: use embeds and stuff to make it more nice
     public static void register() {
         JDAUtilities.createSlashCommand("play", "Plays a song")
                 .addAlias("p")
+                .addCondition(NOT_BANNED)
+                .addCondition(IN_VOICE_CHANNEL)
                 .addOption(
                         new CommandOption(OptionType.STRING, "query", "A search query or URL", true, true)
                                 .onAutoComplete(event -> {
@@ -103,7 +141,6 @@ public class MusicCommands {
                                     event.replyChoiceStrings(titles).queue();
                                 })
                 )
-                .addCondition(IN_VOICE_CHANNEL)
                 .executes(event -> {
                     //join voice channel
                     final AudioManager audioManager = AudioManager.get(event.getGuild());
@@ -134,6 +171,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("pause", "Pauses the current song")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(event -> {
@@ -151,6 +189,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("resume", "Resumes the current song")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(event -> {
@@ -169,6 +208,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("skip", "Skips the current song")
                 .addAlias("s")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(event -> {
@@ -189,6 +229,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("prev", "Goes back to the previous song")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .executes(event -> {
@@ -202,6 +243,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("stop", "Stops playing music")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .executes(event -> {
@@ -213,6 +255,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("disconnect", "Disconnects the bot from the voice channel")
                 .addAlias("dc")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .executes(event -> {
@@ -224,10 +267,11 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("seek", "Seeks to a position in the current song")
                 .addAlias("goto")
-                .addOption(new CommandOption(OptionType.INTEGER, "minutes", "The amount of minutes to seek", false))
-                .addOption(new CommandOption(OptionType.INTEGER, "seconds", "The amount of seconds to seek", false))
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
+                .addOption(new CommandOption(OptionType.INTEGER, "minutes", "The amount of minutes to seek", false))
+                .addOption(new CommandOption(OptionType.INTEGER, "seconds", "The amount of seconds to seek", false))
                 .executes(event -> {
                     final OptionMapping minutes = event.getOption("minutes");
                     final OptionMapping seconds = event.getOption("seconds");
@@ -247,9 +291,10 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("volume", "Sets the volume of the bot")
                 .addAlias("vol")
-                .addOption(new CommandOption(OptionType.INTEGER, "volume", "The volume to set"))
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
+                .addOption(new CommandOption(OptionType.INTEGER, "volume", "The volume to set"))
                 .executes(event -> {
                     final OptionMapping volume = event.getOption("volume");
                     if (volume == null) {
@@ -274,6 +319,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("queue", "Shows the current queue")
                 .addAlias("q")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(EMPTY_QUEUE)
@@ -294,6 +340,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("clear", "Clears the current queue")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(EMPTY_QUEUE)
@@ -305,6 +352,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("shuffle", "Shuffles the current queue")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(EMPTY_QUEUE)
@@ -317,6 +365,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("loop", "Loops the current song")
                 .addAlias("repeat")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .executes(event -> {
@@ -329,10 +378,11 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("remove", "Removes a song from the queue")
                 .addAlias("rm")
-                .addOption(new CommandOption(OptionType.INTEGER, "index", "The index of the song to remove", true))
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(EMPTY_QUEUE)
+                .addOption(new CommandOption(OptionType.INTEGER, "index", "The index of the song to remove", true))
                 .executes(event -> {
                     int index = event.getOption("index").getAsInt();
                     index--;
@@ -360,6 +410,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("lyrics", "Shows the lyrics of the current song")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(event -> {
@@ -382,6 +433,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("nowplaying", "Shows the currently playing song")
                 .addAlias("np")
+                .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .executes(event -> {

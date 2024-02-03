@@ -1,9 +1,11 @@
 package dev.JustRed23.grandfather;
 
 import dev.JustRed23.abcm.Config;
+import dev.JustRed23.grandfather.command.AdminCommands;
 import dev.JustRed23.grandfather.command.MusicCommands;
 import dev.JustRed23.grandfather.services.UpdateService;
 import dev.JustRed23.jdautils.JDAUtilities;
+import dev.JustRed23.jdautils.command.Command;
 import dev.JustRed23.jdautils.settings.DefaultGuildSettingManager;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
@@ -60,6 +62,7 @@ public class App extends Application {
 
         getServicePool().addService(UpdateService.class);
 
+        AdminCommands.register();
         MusicCommands.register();
     }
 
@@ -76,6 +79,8 @@ public class App extends Application {
 
         shardManager = builder.build();
         shardManager.addEventListener(JDAUtilities.getInstance().withGuildSettingManager(new DefaultGuildSettingManager()).listener());
+
+        shardManager.getShards().forEach(jda -> jda.updateCommands().addCommands(Command.globalCommands).queue());
     }
 
     protected void stop() {
