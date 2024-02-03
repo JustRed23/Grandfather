@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.ex.ErrorHandler;
 import dev.JustRed23.grandfather.utils.HttpUtils;
+import dev.JustRed23.grandfather.utils.LyricsProvider;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.CommandOption;
 import dev.JustRed23.jdautils.music.AudioManager;
@@ -358,7 +359,24 @@ public class MusicCommands {
                 .setGuildOnly()
                 .buildAndRegister();
 
-        //TODO: optional - lyrics
+        JDAUtilities.createSlashCommand("lyrics", "Shows the lyrics of the current song")
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(event -> {
+                    final TrackInfo current = AudioManager.get(event.getGuild()).getScheduler().getPlayingTrackInfo();
+                    if (current == null) {
+                        event.reply("There is no song currently playing!").setEphemeral(true).queue();
+                        return false;
+                    }
+                    return true;
+                })
+                .executes(event -> {
+                    final TrackInfo current = AudioManager.get(event.getGuild()).getScheduler().getPlayingTrackInfo();
+                    event.replyEmbeds(LyricsProvider.getLyrics(current).build()).queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
         //TODO: optional - playlist
         //TODO: optional - effect
 
