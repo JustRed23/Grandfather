@@ -7,6 +7,7 @@ import dev.JustRed23.jdautils.settings.ConfigReturnValue;
 import dev.JustRed23.jdautils.settings.GuildSettingManager;
 import dev.JustRed23.jdautils.settings.Setting;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
@@ -27,7 +28,8 @@ public class AdminCommands {
                 .addCondition(REQUIRE_ADMIN)
                 .addOption(new CommandOption(OptionType.USER, "user", "The user to ban", true))
                 .executes(event -> {
-                    final long userID = event.getOption("user").getAsUser().getIdLong();
+                    final User user = event.getOption("user").getAsUser();
+                    final long userID = user.getIdLong();
 
                     final GuildSettingManager manager = JDAUtilities.getGuildSettingManager();
                     final Setting currentlyBanned = manager.getOrDefault(event.getGuild().getIdLong(), "music_banned_users", "");
@@ -44,7 +46,7 @@ public class AdminCommands {
                         return;
                     }
 
-                    event.reply("User has been banned from using music commands!").setEphemeral(true).queue();
+                    event.reply(user.getEffectiveName() + " has been banned from using music commands!").setEphemeral(true).queue();
                     MusicCommands.clearKnownBannedUsers();
                 })
                 .setGuildOnly()
@@ -54,7 +56,8 @@ public class AdminCommands {
                 .addCondition(REQUIRE_ADMIN)
                 .addOption(new CommandOption(OptionType.USER, "user", "The user to unban", true))
                 .executes(event -> {
-                    final long userID = event.getOption("user").getAsUser().getIdLong();
+                    final User user = event.getOption("user").getAsUser();
+                    final long userID = user.getIdLong();
 
                     final GuildSettingManager manager = JDAUtilities.getGuildSettingManager();
                     final Setting currentlyBanned = manager.getOrDefault(event.getGuild().getIdLong(), "music_banned_users", "");
@@ -71,7 +74,7 @@ public class AdminCommands {
                         return;
                     }
 
-                    event.reply("User has been unbanned from using music commands!").setEphemeral(true).queue();
+                    event.reply(user.getEffectiveName() + " has been unbanned from using music commands!").setEphemeral(true).queue();
                     MusicCommands.clearKnownBannedUsers();
                 })
                 .setGuildOnly()
