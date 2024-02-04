@@ -266,6 +266,24 @@ public class MusicCommands {
                 .setGuildOnly()
                 .buildAndRegister();
 
+        JDAUtilities.createSlashCommand("repeat", "Repeats the current song")
+                .addCondition(NOT_BANNED)
+                .addCondition(IN_VOICE_CHANNEL)
+                .addCondition(BOT_NOT_PLAYING)
+                .addCondition(event -> {
+                    if (!AudioManager.get(event.getGuild()).getScheduler().isPlaying()) {
+                        event.reply("There is no song currently playing!").setEphemeral(true).queue();
+                        return false;
+                    }
+                    return true;
+                })
+                .executes(event -> {
+                    AudioManager.get(event.getGuild()).getControls().seek(0);
+                    event.reply("Repeating the current song").queue();
+                })
+                .setGuildOnly()
+                .buildAndRegister();
+
         JDAUtilities.createSlashCommand("seek", "Seeks to a position in the current song")
                 .addAlias("goto")
                 .addCondition(NOT_BANNED)
@@ -365,7 +383,6 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("loop", "Loops the current song")
-                .addAlias("repeat")
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
