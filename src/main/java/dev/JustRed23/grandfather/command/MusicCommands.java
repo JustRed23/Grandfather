@@ -18,6 +18,7 @@ import dev.JustRed23.jdautils.music.search.Search;
 import dev.JustRed23.jdautils.music.search.YouTubeSource;
 import dev.JustRed23.jdautils.settings.ConfigReturnValue;
 import dev.JustRed23.jdautils.settings.Setting;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -423,7 +424,19 @@ public class MusicCommands {
                 })
                 .executes(event -> {
                     final TrackInfo current = AudioManager.get(event.getGuild()).getScheduler().getPlayingTrackInfo();
-                    event.replyEmbeds(LyricsProvider.getLyrics(current).build()).queue();
+
+                    event.deferReply().queue(hook -> {
+                        EmbedBuilder builder;
+                        try {
+                            builder = LyricsProvider.getLyrics(current);
+                        } catch (Exception e) {
+                            hook.sendMessage("An error occurred while trying to get the lyrics!").queue();
+                            ErrorHandler.handleException("lyrics-search", e);
+                            return;
+                        }
+
+                        hook.sendMessageEmbeds(builder.build()).queue();
+                    });
                 })
                 .setGuildOnly()
                 .buildAndRegister();
