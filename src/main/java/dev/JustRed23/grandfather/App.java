@@ -2,6 +2,7 @@ package dev.JustRed23.grandfather;
 
 import dev.JustRed23.abcm.Config;
 import dev.JustRed23.grandfather.command.AdminCommands;
+import dev.JustRed23.grandfather.command.GeneralCommands;
 import dev.JustRed23.grandfather.command.MusicCommands;
 import dev.JustRed23.grandfather.services.UpdateService;
 import dev.JustRed23.jdautils.JDAUtilities;
@@ -63,6 +64,7 @@ public class App extends Application {
         getServicePool().addService(UpdateService.class);
 
         AdminCommands.register();
+        GeneralCommands.register();
         MusicCommands.register();
     }
 

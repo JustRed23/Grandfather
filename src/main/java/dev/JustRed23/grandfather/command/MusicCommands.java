@@ -486,7 +486,5 @@ public class MusicCommands {
                 })
                 .setGuildOnly()
                 .buildAndRegister();
-
-        //TODO: stats
     }
 }

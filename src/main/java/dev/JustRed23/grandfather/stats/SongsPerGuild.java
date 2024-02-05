@@ -1,5 +1,7 @@
 package dev.JustRed23.grandfather.stats;
 
+import dev.JustRed23.jdautils.utils.ValueStore;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +12,17 @@ public class SongsPerGuild {
     public static final Map<Long, SongsPerGuild> stats = new HashMap<>();
     public static SongsPerGuild get(long guildID) {
         return stats.computeIfAbsent(guildID, k -> new SongsPerGuild());
+    }
+
+    public static void save() {
+        ValueStore store = ValueStore.loadOrCreate("song-stats");
+        //TODO
+        store.save();
+    }
+
+    public static void load() {
+        ValueStore store = ValueStore.loadOrCreate("song-stats");
+        //TODO
     }
 
 
