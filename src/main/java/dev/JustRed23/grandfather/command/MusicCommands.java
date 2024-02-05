@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.ex.ErrorHandler;
+import dev.JustRed23.grandfather.stats.SongsPerGuild;
 import dev.JustRed23.grandfather.utils.HttpUtils;
 import dev.JustRed23.grandfather.utils.LyricsProvider;
 import dev.JustRed23.jdautils.JDAUtilities;
@@ -150,13 +151,20 @@ public class MusicCommands {
                     String query = event.getOption("query").getAsString();
                     if (!HttpUtils.isUrl(query)) query = "ytsearch:" + query;
 
+                    final SongsPerGuild stats = SongsPerGuild.get(event.getGuild().getIdLong());
                     audioManager.loadAndPlay(query, event.getMember(), new TrackLoadCallback() {
                         public void onTrackLoaded(TrackInfo trackInfo, boolean addedToQueue, long durationMs) {
                             event.reply("Added " + trackInfo.track().getInfo().title + " by " + trackInfo.track().getInfo().author + " to the queue").queue();
+
+                            //stats
+                            stats.play(event.getMember().getIdLong(), trackInfo.track().getInfo().title);
                         }
 
                         public void onPlaylistLoaded(AudioPlaylist playlist, List<TrackInfo> tracks, long totalDurationMs) {
                             event.reply("Added " + playlist.getTracks().size() + " tracks from playlist " + playlist.getName() + " to the queue").queue();
+
+                            //stats
+                            tracks.forEach(trackInfo -> stats.play(event.getMember().getIdLong(), trackInfo.track().getInfo().title));
                         }
 
                         public void onNoMatches() {
@@ -225,6 +233,9 @@ public class MusicCommands {
                         event.reply("There are no more songs in the queue, stopped playing").queue();
                     else
                         event.reply("Skipped to " + next.track().getInfo().title + " by " + next.track().getInfo().author).queue();
+
+                    //stats
+                    SongsPerGuild.get(event.getGuild().getIdLong()).skip();
                 })
                 .setGuildOnly()
                 .buildAndRegister();
