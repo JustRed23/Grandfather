@@ -26,6 +26,7 @@ public class SongsPerGuild {
 
     public static void load() {
         JsonObject data = storage.data;
+        if (data == null) return;
         data.entrySet().forEach(entry -> stats.put(Long.parseLong(entry.getKey()), new SongsPerGuild(entry.getValue().getAsJsonObject())));
     }
 

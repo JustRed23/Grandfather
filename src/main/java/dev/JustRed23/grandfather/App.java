@@ -64,9 +64,6 @@ public class App extends Application {
 
         getServicePool().addService(UpdateService.class);
 
-        //Load stats
-        SongsPerGuild.load();
-
         //Load commands
         AdminCommands.register();
         GeneralCommands.register();
@@ -83,6 +80,9 @@ public class App extends Application {
             exit();
             return;
         }
+
+        //Load stats
+        SongsPerGuild.load();
 
         shardManager = builder.build();
         shardManager.addEventListener(JDAUtilities.getInstance().withGuildSettingManager(new DefaultGuildSettingManager()).listener());
