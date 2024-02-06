@@ -5,6 +5,7 @@ import dev.JustRed23.grandfather.command.AdminCommands;
 import dev.JustRed23.grandfather.command.GeneralCommands;
 import dev.JustRed23.grandfather.command.MusicCommands;
 import dev.JustRed23.grandfather.services.UpdateService;
+import dev.JustRed23.grandfather.stats.SongsPerGuild;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.Command;
 import dev.JustRed23.jdautils.settings.DefaultGuildSettingManager;
@@ -32,7 +33,7 @@ public class App extends Application {
     protected void init() {
         LOGGER = SBLogger.getLogger(Bot.name);
         version = GitVersion.fromFile(getClass().getClassLoader().getResourceAsStream("application.properties"));
-        FileStructure.disable();
+        FileStructure.discover(GFS.class);
         builder = DefaultShardManagerBuilder.createDefault(Bot.token)
                 .setBulkDeleteSplittingEnabled(false)
                 .setEnableShutdownHook(false)
@@ -63,6 +64,10 @@ public class App extends Application {
 
         getServicePool().addService(UpdateService.class);
 
+        //Load stats
+        SongsPerGuild.load();
+
+        //Load commands
         AdminCommands.register();
         GeneralCommands.register();
         MusicCommands.register();
@@ -88,6 +93,9 @@ public class App extends Application {
     protected void stop() {
         if (shardManager == null || !Bot.enabled)
             return;
+
+        //Save stats
+        SongsPerGuild.save();
 
         //Copied from BotCommons
         shardManager.shutdown();
