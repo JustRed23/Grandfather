@@ -3,9 +3,8 @@ package dev.JustRed23.grandfather.command;
 import dev.JustRed23.grandfather.ex.ErrorHandler;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.CommandOption;
-import dev.JustRed23.jdautils.settings.ConfigReturnValue;
-import dev.JustRed23.jdautils.settings.GuildSettingManager;
-import dev.JustRed23.jdautils.settings.Setting;
+import dev.JustRed23.jdautils.data.DataStore;
+import dev.JustRed23.jdautils.data.InteractionResult;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -31,18 +30,17 @@ public class AdminCommands {
                     final User user = event.getOption("user").getAsUser();
                     final long userID = user.getIdLong();
 
-                    final GuildSettingManager manager = JDAUtilities.getGuildSettingManager();
-                    final Setting currentlyBanned = manager.getOrDefault(event.getGuild().getIdLong(), "music_banned_users", "");
+                    final String currentlyBanned = DataStore.GUILD.get(event.getGuild().getIdLong(), "music_banned_users").orElse("");
 
-                    if (currentlyBanned.stringValue().contains(String.valueOf(userID))) {
+                    if (currentlyBanned.contains(String.valueOf(userID))) {
                         event.reply("This user is already banned from using music commands!").setEphemeral(true).queue();
                         return;
                     }
 
-                    final ConfigReturnValue status = manager.set(event.getGuild().getIdLong(), "music_banned_users", currentlyBanned.stringValue() + userID + ",");
-                    if (status == ConfigReturnValue.ERROR) {
+                    final InteractionResult status = DataStore.GUILD.insertOrUpdate(event.getGuild().getIdLong(), "music_banned_users", currentlyBanned + userID + ",");
+                    if (status == InteractionResult.ERROR) {
                         event.reply("An error occurred while trying to ban the user!").setEphemeral(true).queue();
-                        ErrorHandler.handleException("musicban", status.getException());
+                        ErrorHandler.handleException("musicban", status.getError());
                         return;
                     }
 
@@ -59,18 +57,17 @@ public class AdminCommands {
                     final User user = event.getOption("user").getAsUser();
                     final long userID = user.getIdLong();
 
-                    final GuildSettingManager manager = JDAUtilities.getGuildSettingManager();
-                    final Setting currentlyBanned = manager.getOrDefault(event.getGuild().getIdLong(), "music_banned_users", "");
+                    final String currentlyBanned = DataStore.GUILD.get(event.getGuild().getIdLong(), "music_banned_users").orElse("");
 
-                    if (!currentlyBanned.stringValue().contains(String.valueOf(userID))) {
+                    if (!currentlyBanned.contains(String.valueOf(userID))) {
                         event.reply("This user is not banned from using music commands!").setEphemeral(true).queue();
                         return;
                     }
 
-                    final ConfigReturnValue status = manager.set(event.getGuild().getIdLong(), "music_banned_users", currentlyBanned.stringValue().replace(userID + ",", ""));
-                    if (status == ConfigReturnValue.ERROR) {
+                    final InteractionResult status = DataStore.GUILD.insertOrUpdate(event.getGuild().getIdLong(), "music_banned_users", currentlyBanned.replace(userID + ",", ""));
+                    if (status == InteractionResult.ERROR) {
                         event.reply("An error occurred while trying to unban the user!").setEphemeral(true).queue();
-                        ErrorHandler.handleException("musicunban", status.getException());
+                        ErrorHandler.handleException("musicunban", status.getError());
                         return;
                     }
 

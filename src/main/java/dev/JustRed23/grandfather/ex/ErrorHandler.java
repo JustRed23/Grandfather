@@ -7,7 +7,7 @@ public final class ErrorHandler {
 
     private static final Logger LOGGER = SBLogger.getLogger(ErrorHandler.class);
 
-    public static void handleException(String action, Exception e) {
+    public static void handleException(String action, Throwable e) {
         LOGGER.error("An error occurred while executing action '" + action + "'!", e);
     }
 }

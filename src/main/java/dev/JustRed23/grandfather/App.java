@@ -8,7 +8,7 @@ import dev.JustRed23.grandfather.services.UpdateService;
 import dev.JustRed23.grandfather.stats.SongsPerGuild;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.Command;
-import dev.JustRed23.jdautils.settings.DefaultGuildSettingManager;
+import dev.JustRed23.jdautils.data.DataStore;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
@@ -64,6 +64,9 @@ public class App extends Application {
 
         getServicePool().addService(UpdateService.class);
 
+        //Create db cache
+        DataStore.createCache(1000);
+
         //Load commands
         AdminCommands.register();
         GeneralCommands.register();
@@ -85,7 +88,7 @@ public class App extends Application {
         SongsPerGuild.load();
 
         shardManager = builder.build();
-        shardManager.addEventListener(JDAUtilities.getInstance().withGuildSettingManager(new DefaultGuildSettingManager()).listener());
+        shardManager.addEventListener(JDAUtilities.getInstance().withDatabase().fileBased("grandfather-settings.db").listener());
 
         shardManager.getShards().forEach(jda -> jda.updateCommands().addCommands(Command.globalCommands).queue());
     }

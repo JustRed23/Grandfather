@@ -12,13 +12,13 @@ import dev.JustRed23.grandfather.utils.HttpUtils;
 import dev.JustRed23.grandfather.utils.LyricsProvider;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.CommandOption;
+import dev.JustRed23.jdautils.data.DataStore;
+import dev.JustRed23.jdautils.data.InteractionResult;
 import dev.JustRed23.jdautils.music.AudioManager;
 import dev.JustRed23.jdautils.music.TrackInfo;
 import dev.JustRed23.jdautils.music.TrackLoadCallback;
 import dev.JustRed23.jdautils.music.search.Search;
 import dev.JustRed23.jdautils.music.search.YouTubeSource;
-import dev.JustRed23.jdautils.settings.ConfigReturnValue;
-import dev.JustRed23.jdautils.settings.Setting;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -87,14 +87,14 @@ public class MusicCommands {
         if (!cacheIsUpToDate) {
             knownBannedUsers.clear();
 
-            final Setting bannedUsers = JDAUtilities.getGuildSettingManager().getOrDefault(event.getGuild().getIdLong(), "music_banned_users", "");
+            String bannedUsers = DataStore.GUILD.get(event.getGuild().getIdLong(), "music_banned_users").orElse("");
 
-            if (bannedUsers.stringValue().isBlank()) {
+            if (bannedUsers.isBlank()) {
                 cacheIsUpToDate = true;
                 return true;
             }
 
-            for (String s : bannedUsers.stringValue().split(",")) {
+            for (String s : bannedUsers.split(",")) {
                 if (s.isBlank()) continue;
                 knownBannedUsers.add(Long.parseLong(s));
             }
@@ -333,14 +333,14 @@ public class MusicCommands {
                     }
 
                     final int vol = volume.getAsInt();
-                    final ConfigReturnValue val = AudioManager.get(event.getGuild()).getAudioModifier().setVolume(vol);
-                    if (val == ConfigReturnValue.INVALID_VALUE) {
+                    final InteractionResult val = AudioManager.get(event.getGuild()).getAudioModifier().setVolume(vol);
+                    if (val == null) {
                         event.reply("The volume must be between 0 and 100!").setEphemeral(true).queue();
                         return;
                     }
 
-                    if (val == ConfigReturnValue.ERROR)
-                        ErrorHandler.handleException("db-change-volume", val.getException());
+                    if (val == InteractionResult.ERROR)
+                        ErrorHandler.handleException("db-change-volume", val.getError());
 
                     event.reply("Set the volume to " + vol).queue();
                 })
