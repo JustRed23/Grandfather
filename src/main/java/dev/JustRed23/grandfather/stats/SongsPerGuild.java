@@ -14,8 +14,13 @@ public class SongsPerGuild {
 
     private static final StatStorage storage = new StatStorage(GFS.stats.getDirectory(), "song-stats.json");
     public static final Map<Long, SongsPerGuild> stats = new HashMap<>();
+
     public static SongsPerGuild get(long guildID) {
         return stats.computeIfAbsent(guildID, k -> new SongsPerGuild());
+    }
+
+    public static boolean has(long guildID) {
+        return stats.containsKey(guildID);
     }
 
     public static void save() {
@@ -52,10 +57,7 @@ public class SongsPerGuild {
     public void play(long userID, String title) {
         songsPlayed++;
         songsPlayedCount.put(title, songsPlayedCount.getOrDefault(title, 0) + 1);
-
-        final List<String> strings = songsPlayedByUser.computeIfAbsent(userID, k -> new ArrayList<>());
-        if (!strings.contains(title))
-            strings.add(title);
+        songsPlayedByUser.computeIfAbsent(userID, k -> new ArrayList<>()).add(title);
     }
 
     public void skip() {
