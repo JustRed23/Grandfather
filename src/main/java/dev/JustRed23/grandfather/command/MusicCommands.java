@@ -117,6 +117,9 @@ public class MusicCommands {
     }
 
     //TODO: use embeds and stuff to make it more nice
+    //TODO: make sure that song names are sanitized in case of || this ||
+    //TODO: bind to channel when playing
+    //TODO: add automatic disconnection after a certain amount of time / when no one is in the channel
     public static void register() {
         JDAUtilities.createSlashCommand("play", "Plays a song")
                 .addAlias("p")
