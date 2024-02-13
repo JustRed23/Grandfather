@@ -1,5 +1,7 @@
 package dev.JustRed23.grandfather.command;
 
+import dev.JustRed23.grandfather.App;
+import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.ex.ErrorHandler;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.CommandOption;
@@ -8,6 +10,7 @@ import dev.JustRed23.jdautils.data.InteractionResult;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.function.Function;
@@ -47,6 +50,7 @@ public class AdminCommands {
                     event.reply(user.getEffectiveName() + " has been banned from using music commands!").setEphemeral(true).queue();
                     MusicCommands.clearKnownBannedUsers();
                 })
+                .modifyData(data -> data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)))
                 .setGuildOnly()
                 .buildAndRegister();
 
@@ -74,6 +78,24 @@ public class AdminCommands {
                     event.reply(user.getEffectiveName() + " has been unbanned from using music commands!").setEphemeral(true).queue();
                     MusicCommands.clearKnownBannedUsers();
                 })
+                .modifyData(data -> data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)))
+                .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("shutdown", "Shut down the bot")
+                .addCondition(event -> {
+                    if (event.getMember() == null || !(event.getMember().getIdLong() == Bot.owner_id)) {
+                        event.reply("You need to be the bot owner to use this command!").setEphemeral(true).queue();
+                        return false;
+                    }
+
+                    return true;
+                })
+                .executes(event -> {
+                    event.reply("Shutting down...").setEphemeral(true).complete();
+                    App.exit();
+                })
+                .modifyData(data -> data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)))
                 .setGuildOnly()
                 .buildAndRegister();
     }
