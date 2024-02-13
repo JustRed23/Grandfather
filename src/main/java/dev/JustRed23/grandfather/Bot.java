@@ -30,8 +30,8 @@ public class Bot {
     public static String youtube_api_key;
 
     @ConfigField(defaultValue = "253219587787718658")
-    public static String owner_id;
+    public static long owner_id;
 
     @ConfigField(defaultValue = "826438912535691295")
-    public static String guild_id;
+    public static long guild_id;
 }
