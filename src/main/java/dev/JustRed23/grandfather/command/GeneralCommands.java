@@ -6,6 +6,7 @@ import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.jdautils.JDAUtilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class GeneralCommands {
                 for (int i = 0; i < songs.size(); i++) {
                     final SongsPerGuild.SongStat song = songs.get(i);
                     topSongs.append("**").append(i + 1).append("**. ")
-                            .append(song.title())
+                            .append(MarkdownSanitizer.escape(song.title()))
                             .append("\n")
                             .append("`played ").append(song.plays()).append(song.plays() == 1 ? " time" : " times").append("`")
                             .append("\n\n");
