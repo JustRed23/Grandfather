@@ -21,16 +21,18 @@ import dev.JustRed23.jdautils.music.search.Search;
 import dev.JustRed23.jdautils.music.search.YouTubeSource;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class MusicCommands {
 
@@ -143,8 +145,19 @@ public class MusicCommands {
                                         return;
                                     }
 
-                                    final List<String> titles = search.stream().map(s -> s.getSnippet().getTitle()).toList();
-                                    event.replyChoiceStrings(titles.stream().map(s -> s.length() > OptionData.MAX_CHOICE_NAME_LENGTH ? s.substring(0, OptionData.MAX_CHOICE_NAME_LENGTH - 3) + "..." : s).toList()).queue();
+                                    if (search.isEmpty()) {
+                                        event.replyChoices(List.of()).queue();
+                                        return;
+                                    }
+
+                                    final Map<String, String> titleWithId = search.stream()
+                                            .collect(Collectors.toMap(s -> s.getSnippet().getTitle(), s -> s.getId().getVideoId()));
+
+                                    final List<Command.Choice> choices = titleWithId.entrySet().stream()
+                                            .map(e -> new Command.Choice(e.getKey(), YouTubeSource.getVideo(e.getValue())))
+                                            .toList();
+
+                                    event.replyChoices(choices).queue();
                                 })
                 )
                 .executes(event -> {
