@@ -8,10 +8,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.ex.ErrorHandler;
 import dev.JustRed23.grandfather.stats.SongsPerGuild;
+import dev.JustRed23.grandfather.ui.MusicEmbeds;
+import dev.JustRed23.grandfather.ui.QueueComponent;
 import dev.JustRed23.grandfather.utils.HttpUtils;
 import dev.JustRed23.grandfather.utils.LyricsProvider;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.CommandOption;
+import dev.JustRed23.jdautils.component.SendableComponent;
 import dev.JustRed23.jdautils.data.DataStore;
 import dev.JustRed23.jdautils.data.InteractionResult;
 import dev.JustRed23.jdautils.music.AudioManager;
@@ -20,6 +23,7 @@ import dev.JustRed23.jdautils.music.TrackLoadCallback;
 import dev.JustRed23.jdautils.music.search.Search;
 import dev.JustRed23.jdautils.music.search.YouTubeSource;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -30,9 +34,7 @@ import java.security.GeneralSecurityException;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class MusicCommands {
 
@@ -118,7 +120,6 @@ public class MusicCommands {
         cacheIsUpToDate = false;
     }
 
-    //TODO: use embeds and stuff to make it more nice
     //TODO: make sure that song names are sanitized in case of || this ||
     //TODO: bind to channel when playing
     //TODO: add automatic disconnection after a certain amount of time / when no one is in the channel
@@ -145,16 +146,13 @@ public class MusicCommands {
                                         return;
                                     }
 
-                                    if (search.isEmpty()) {
+                                    if (search == null || search.isEmpty()) {
                                         event.replyChoices(List.of()).queue();
                                         return;
                                     }
 
-                                    final Map<String, String> titleWithId = search.stream()
-                                            .collect(Collectors.toMap(s -> s.getSnippet().getTitle(), s -> s.getId().getVideoId()));
-
-                                    final List<Command.Choice> choices = titleWithId.entrySet().stream()
-                                            .map(e -> new Command.Choice(e.getKey(), YouTubeSource.getVideo(e.getValue())))
+                                    final List<Command.Choice> choices = search.stream()
+                                            .map(e -> new Command.Choice(e.getSnippet().getTitle(), YouTubeSource.getVideo(e.getId().getVideoId())))
                                             .toList();
 
                                     event.replyChoices(choices).queue();
@@ -171,14 +169,16 @@ public class MusicCommands {
                     final SongsPerGuild stats = SongsPerGuild.get(event.getGuild().getIdLong());
                     audioManager.loadAndPlay(query, event.getMember(), new TrackLoadCallback() {
                         public void onTrackLoaded(TrackInfo trackInfo, boolean addedToQueue, long durationMs) {
-                            event.reply("Added " + trackInfo.track().getInfo().title + " by " + trackInfo.track().getInfo().author + " to the queue").queue();
+                            EmbedBuilder builder = MusicEmbeds.onPlay(trackInfo, durationMs, addedToQueue, audioManager.getScheduler().getQueue().size());
+                            event.replyEmbeds(builder.build()).queue();
 
                             //stats
                             stats.play(event.getMember().getIdLong(), trackInfo.track().getInfo().title);
                         }
 
                         public void onPlaylistLoaded(AudioPlaylist playlist, List<TrackInfo> tracks, long totalDurationMs) {
-                            event.reply("Added " + playlist.getTracks().size() + " tracks from playlist " + playlist.getName() + " to the queue").queue();
+                            EmbedBuilder builder = MusicEmbeds.onPlaylistAdded(tracks, totalDurationMs, playlist, audioManager.getScheduler().getQueue().size());
+                            event.replyEmbeds(builder.build()).queue();
 
                             //stats
                             tracks.forEach(trackInfo -> stats.play(event.getMember().getIdLong(), trackInfo.track().getInfo().title));
@@ -249,7 +249,7 @@ public class MusicCommands {
                     if (next == null)
                         event.reply("There are no more songs in the queue, stopped playing").queue();
                     else
-                        event.reply("Skipped to " + next.track().getInfo().title + " by " + next.track().getInfo().author).queue();
+                        event.replyEmbeds(MusicEmbeds.onSkip(next.track()).build()).queue();
 
                     //stats
                     SongsPerGuild.get(event.getGuild().getIdLong()).skip();
@@ -266,7 +266,7 @@ public class MusicCommands {
                     if (prev == null)
                         event.reply("There are no more songs in the queue, stopped playing").queue();
                     else
-                        event.reply("Went back to " + prev.track().getInfo().title + " by " + prev.track().getInfo().author).queue();
+                        event.replyEmbeds(MusicEmbeds.onPrev(prev.track()).build()).queue();
                 })
                 .setGuildOnly()
                 .buildAndRegister();
@@ -371,17 +371,8 @@ public class MusicCommands {
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(EMPTY_QUEUE)
                 .executes(event -> {
-                    //concurrency
-                    final LinkedList<AudioTrack> queue = new LinkedList<>(AudioManager.get(event.getGuild()).getScheduler().getQueue());
-
-                    final StringBuilder builder = new StringBuilder();
-                    builder.append("Current queue:\n");
-                    for (int i = 0; i < queue.size(); i++) {
-                        final AudioTrack track = queue.get(i);
-                        builder.append(i + 1).append(". ").append(track.getInfo().title).append(" by ").append(track.getInfo().author).append("\n");
-                    }
-
-                    event.reply(builder.toString()).queue();
+                    final SendableComponent component = JDAUtilities.createComponent(QueueComponent.class, new Class[]{Guild.class}, event.getGuild());
+                    component.reply(event);
                 })
                 .setGuildOnly()
                 .buildAndRegister();
@@ -499,7 +490,7 @@ public class MusicCommands {
                     if (current == null)
                         event.reply("There is no song currently playing!").queue();
                     else
-                        event.reply("Currently playing " + current.track().getInfo().title + " by " + current.track().getInfo().author).queue();
+                        event.replyEmbeds(MusicEmbeds.onNowPlaying(current.track()).build()).queue();
                 })
                 .setGuildOnly()
                 .buildAndRegister();
