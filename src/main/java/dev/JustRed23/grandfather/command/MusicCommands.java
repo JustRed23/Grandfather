@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -152,7 +153,13 @@ public class MusicCommands {
                                     }
 
                                     final List<Command.Choice> choices = search.stream()
-                                            .map(e -> new Command.Choice(e.getSnippet().getTitle(), YouTubeSource.getVideo(e.getId().getVideoId())))
+                                            .map(e -> {
+                                                String title = e.getSnippet().getTitle();
+                                                if (title.length() > OptionData.MAX_CHOICE_NAME_LENGTH)
+                                                    title = title.substring(0, OptionData.MAX_CHOICE_NAME_LENGTH - 3) + "...";
+
+                                                return new Command.Choice(title, YouTubeSource.getVideo(e.getId().getVideoId()));
+                                            })
                                             .toList();
 
                                     event.replyChoices(choices).queue();
