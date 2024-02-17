@@ -19,7 +19,8 @@ public final class TimeUtils {
         return switch (format) {
             case FULL -> days + " days, " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
             case CLOCK ->
-                    days > 0 ? String.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds) : String.format("%02d:%02d:%02d", hours, minutes, seconds);
+                    days > 0 ? String.format("%02d:%02d:%02d:%02d", days, hours, minutes, seconds) :
+                            hours > 0 ? String.format("%02d:%02d:%02d", hours, minutes, seconds) : String.format("%02d:%02d", minutes, seconds);
             case SHORT -> days + "d " + hours + "h";
         };
     }
