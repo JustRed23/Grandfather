@@ -12,6 +12,7 @@ import dev.JustRed23.grandfather.ui.MusicEmbeds;
 import dev.JustRed23.grandfather.ui.QueueComponent;
 import dev.JustRed23.grandfather.utils.HttpUtils;
 import dev.JustRed23.grandfather.utils.LyricsProvider;
+import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.CommandOption;
 import dev.JustRed23.jdautils.component.SendableComponent;
@@ -325,6 +326,13 @@ public class MusicCommands {
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
+                .addCondition(event -> {
+                    if (!AudioManager.get(event.getGuild()).getScheduler().isPlaying()) {
+                        event.reply("There is no song currently playing!").setEphemeral(true).queue();
+                        return false;
+                    }
+                    return true;
+                })
                 .addOption(new CommandOption(OptionType.INTEGER, "minutes", "The amount of minutes to seek", false))
                 .addOption(new CommandOption(OptionType.INTEGER, "seconds", "The amount of seconds to seek", false))
                 .executes(event -> {
@@ -339,7 +347,15 @@ public class MusicCommands {
                         return;
                     }
 
-                    AudioManager.get(event.getGuild()).getControls().seek(ms);
+                    final AudioManager audioManager = AudioManager.get(event.getGuild());
+
+                    if (ms > audioManager.getScheduler().getPlayingTrack().getDuration()) {
+                        event.reply("The time to seek to must be less than the duration of the song!").setEphemeral(true).queue();
+                        return;
+                    }
+
+                    audioManager.getControls().seek(ms);
+                    event.reply("Seeked to " + TimeUtils.msToFormatted(ms, TimeUtils.TimeFormat.CLOCK)).queue();
                 })
                 .setGuildOnly()
                 .buildAndRegister();
