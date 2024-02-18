@@ -36,6 +36,7 @@ import java.security.GeneralSecurityException;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static net.dv8tion.jda.api.utils.MarkdownSanitizer.escape;
@@ -124,11 +125,27 @@ public class MusicCommands {
         cacheIsUpToDate = false;
     }
 
+    private static final Function<SlashCommandInteractionEvent, Boolean> SAME_TEXT_CHANNEL = event -> {
+        if (AudioManager.get(event.getGuild()).getBoundChannel() == null)
+            return true;
+
+        if (!AudioManager.get(event.getGuild()).isBoundChannel(event.getChannel().asTextChannel())) {
+            event.reply("You must be in the same text channel as the bot to use this command!")
+                    .setEphemeral(true)
+                    .map(m -> m.deleteOriginal().queueAfter(5, TimeUnit.SECONDS))
+                    .queue();
+            return false;
+        }
+
+        return true;
+    };
+
     //TODO: bind to channel when playing
     //TODO: add automatic disconnection after a certain amount of time / when no one is in the channel
     public static void register() {
         JDAUtilities.createSlashCommand("play", "Plays a song")
                 .addAlias("p")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addOption(
@@ -171,6 +188,7 @@ public class MusicCommands {
                     //join voice channel
                     final AudioManager audioManager = AudioManager.get(event.getGuild());
                     audioManager.join(event.getMember().getVoiceState().getChannel().asVoiceChannel());
+                    audioManager.bindTextChannel(event.getChannel().asTextChannel());
 
                     String query = event.getOption("query").getAsString();
                     if (!HttpUtils.isUrl(query)) query = "ytsearch:" + query;
@@ -206,6 +224,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("pause", "Pauses the current song")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -224,6 +243,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("resume", "Resumes the current song")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -243,6 +263,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("skip", "Skips the current song")
                 .addAlias("s")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -267,6 +288,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("prev", "Goes back to the previous song")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -281,6 +303,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("stop", "Stops playing music")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -293,6 +316,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("disconnect", "Disconnects the bot from the voice channel")
                 .addAlias("dc")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -304,6 +328,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("repeat", "Repeats the current song")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -323,6 +348,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("seek", "Seeks to a position in the current song")
                 .addAlias("goto")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -362,6 +388,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("volume", "Sets the volume of the bot")
                 .addAlias("vol")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -390,6 +417,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("queue", "Shows the current queue")
                 .addAlias("q")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -402,6 +430,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("clear", "Clears the current queue")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -414,6 +443,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("shuffle", "Shuffles the current queue")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -426,6 +456,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("loop", "Loops the current song")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -439,6 +470,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("remove", "Removes a song from the queue")
                 .addAlias("rm")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -471,6 +503,7 @@ public class MusicCommands {
                 .buildAndRegister();
 
         JDAUtilities.createSlashCommand("lyrics", "Shows the lyrics of the current song")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
@@ -506,6 +539,7 @@ public class MusicCommands {
 
         JDAUtilities.createSlashCommand("nowplaying", "Shows the currently playing song")
                 .addAlias("np")
+                .addCondition(SAME_TEXT_CHANNEL)
                 .addCondition(NOT_BANNED)
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
