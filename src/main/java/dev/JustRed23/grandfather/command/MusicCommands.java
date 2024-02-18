@@ -90,40 +90,17 @@ public class MusicCommands {
         return true;
     };
 
-    private static boolean cacheIsUpToDate = false;
-    private static final List<Long> knownBannedUsers = new LinkedList<>();
-
     private static final Function<SlashCommandInteractionEvent, Boolean> NOT_BANNED = event -> {
-        if (!cacheIsUpToDate) {
-            knownBannedUsers.clear();
+        String bannedUsers = DataStore.GUILD.get(event.getGuild().getIdLong(), "music_banned_users").orElse("");
 
-            String bannedUsers = DataStore.GUILD.get(event.getGuild().getIdLong(), "music_banned_users").orElse("");
+        if (bannedUsers.isBlank()) return true;
 
-            if (bannedUsers.isBlank()) {
-                cacheIsUpToDate = true;
-                return true;
-            }
-
-            for (String s : bannedUsers.split(",")) {
-                if (s.isBlank()) continue;
-                knownBannedUsers.add(Long.parseLong(s));
-            }
-
-            cacheIsUpToDate = true;
-        }
-
-        if (knownBannedUsers.isEmpty()) return true;
-
-        if (knownBannedUsers.contains(event.getMember().getIdLong())) {
+        if (bannedUsers.contains(String.valueOf(event.getMember().getIdLong()))) {
             event.reply("You are currently banned from using music commands!").queue();
             return false;
         }
         return true;
     };
-
-    public static void clearKnownBannedUsers() {
-        cacheIsUpToDate = false;
-    }
 
     private static final Function<SlashCommandInteractionEvent, Boolean> SAME_TEXT_CHANNEL = event -> {
         if (AudioManager.get(event.getGuild()).getBoundChannel() == null)
@@ -140,7 +117,6 @@ public class MusicCommands {
         return true;
     };
 
-    //TODO: bind to channel when playing
     //TODO: add automatic disconnection after a certain amount of time / when no one is in the channel
     public static void register() {
         JDAUtilities.createSlashCommand("play", "Plays a song")

@@ -48,7 +48,6 @@ public class AdminCommands {
                     }
 
                     event.reply(user.getEffectiveName() + " has been banned from using music commands!").setEphemeral(true).queue();
-                    MusicCommands.clearKnownBannedUsers();
                 })
                 .modifyData(data -> data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)))
                 .setGuildOnly()
@@ -76,7 +75,6 @@ public class AdminCommands {
                     }
 
                     event.reply(user.getEffectiveName() + " has been unbanned from using music commands!").setEphemeral(true).queue();
-                    MusicCommands.clearKnownBannedUsers();
                 })
                 .modifyData(data -> data.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR)))
                 .setGuildOnly()
