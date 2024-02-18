@@ -37,6 +37,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
+import static net.dv8tion.jda.api.utils.MarkdownSanitizer.escape;
+
 public class MusicCommands {
 
     private static final YouTubeSource YT;
@@ -121,7 +123,6 @@ public class MusicCommands {
         cacheIsUpToDate = false;
     }
 
-    //TODO: make sure that song names are sanitized in case of || this ||
     //TODO: bind to channel when playing
     //TODO: add automatic disconnection after a certain amount of time / when no one is in the channel
     public static void register() {
@@ -448,7 +449,7 @@ public class MusicCommands {
                         return;
                     }
 
-                    event.reply("Removed " + track.getInfo().title + " by " + track.getInfo().author + " from the queue").queue();
+                    event.reply("Removed " + escape(track.getInfo().title + " by " + track.getInfo().author) + " from the queue").queue();
                 })
                 .setGuildOnly()
                 .buildAndRegister();

@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.User;
 import java.time.Instant;
 import java.util.List;
 
+import static net.dv8tion.jda.api.utils.MarkdownSanitizer.escape;
+
 public final class MusicEmbeds {
 
     public static EmbedBuilder createDefault() {
@@ -26,11 +28,11 @@ public final class MusicEmbeds {
         builder.setAuthor(addedToQueue ? "Added to queue" : "Now playing");
 
         final AudioTrackInfo info = trackInfo.track().getInfo();
-        builder.setTitle(info.title, info.uri);
+        builder.setTitle(escape(info.title), info.uri);
         builder.setThumbnail(YouTubeSource.getThumbnail(info.identifier));
 
         if (addedToQueue) {
-            builder.addField("Author", info.author, true);
+            builder.addField("Author", escape(info.author), true);
             builder.addField("Duration", info.isStream ? "LIVE" : TimeUtils.msToFormatted(durationMs, TimeUtils.TimeFormat.CLOCK), true);
             builder.addField("Position in queue", String.valueOf(positionInQueue), true);
         }
@@ -45,7 +47,7 @@ public final class MusicEmbeds {
     public static EmbedBuilder onPlaylistAdded(List<TrackInfo> tracks, long totalDurationMs, AudioPlaylist playlist, int positionInQueue) {
         EmbedBuilder builder = createDefault();
         builder.setAuthor("Added playlist to queue");
-        builder.setTitle(playlist.getName());
+        builder.setTitle(escape(playlist.getName()));
 
         builder.setThumbnail(YouTubeSource.getThumbnail(playlist.getSelectedTrack().getInfo().identifier));
 
@@ -65,7 +67,7 @@ public final class MusicEmbeds {
         builder.setAuthor(action);
 
         final AudioTrackInfo info = track.getInfo();
-        builder.setTitle(info.title, info.uri);
+        builder.setTitle(escape(info.title), info.uri);
         builder.setThumbnail(YouTubeSource.getThumbnail(info.identifier));
 
         return builder;

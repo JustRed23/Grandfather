@@ -49,7 +49,7 @@ public final class LyricsProvider {
 
     private static void createEmbed(EmbedBuilder builder, SongSearch.Hit hit) {
         builder.setColor(0xF0E68C);
-        builder.setTitle("Lyrics for " + hit.getTitle() + " by " + hit.getArtist().getName(), hit.getUrl());
+        builder.setTitle("Lyrics for " + MarkdownSanitizer.escape(hit.getTitle() + " by " + hit.getArtist().getName()), hit.getUrl());
         builder.setThumbnail(hit.getThumbnailUrl());
 
         String content = hit.fetchLyrics();

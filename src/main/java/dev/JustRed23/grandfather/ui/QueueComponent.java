@@ -20,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static net.dv8tion.jda.api.utils.MarkdownSanitizer.escape;
+
 public class QueueComponent extends SendableComponent {
 
     private static final int TRACKS_PER_PAGE = 5;
@@ -94,7 +96,7 @@ public class QueueComponent extends SendableComponent {
                 StringBuilder description = new StringBuilder();
                 description.append("\u23AF".repeat(30)).append("\n\n");
 
-                description.append(currentTrack.getInfo().title);
+                description.append(escape(currentTrack.getInfo().title));
                 if (manager.getScheduler().isPaused())
                     description.append(" ***(Paused)***");
 
@@ -124,7 +126,7 @@ public class QueueComponent extends SendableComponent {
 
         for (int i = start; i < end; i++) {
             AudioTrack track = queue.get(i);
-            queueBuilder.append("\n\n").append(i + 1).append(". ").append(track.getInfo().title);
+            queueBuilder.append("\n\n").append(i + 1).append(". ").append(escape(track.getInfo().title));
             queueBuilder.append("\n").append("`")
                     .append(TimeUtils.msToFormatted(track.getDuration(), TimeUtils.TimeFormat.CLOCK))
                     .append("`");
