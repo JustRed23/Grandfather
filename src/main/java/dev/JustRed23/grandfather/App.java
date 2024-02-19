@@ -4,6 +4,7 @@ import dev.JustRed23.abcm.Config;
 import dev.JustRed23.grandfather.command.AdminCommands;
 import dev.JustRed23.grandfather.command.GeneralCommands;
 import dev.JustRed23.grandfather.command.MusicCommands;
+import dev.JustRed23.grandfather.services.InactivityService;
 import dev.JustRed23.grandfather.services.UpdateService;
 import dev.JustRed23.grandfather.stats.SongsPerGuild;
 import dev.JustRed23.jdautils.JDAUtilities;
@@ -63,6 +64,7 @@ public class App extends Application {
                 .setActivity(getDefaultActivity());
 
         getServicePool().addService(UpdateService.class);
+        getServicePool().addService(InactivityService.class);
 
         //Create db cache
         DataStore.createCache(1000);

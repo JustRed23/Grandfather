@@ -11,6 +11,7 @@ import dev.JustRed23.grandfather.stats.SongsPerGuild;
 import dev.JustRed23.grandfather.ui.MusicEmbeds;
 import dev.JustRed23.grandfather.ui.QueueComponent;
 import dev.JustRed23.grandfather.utils.HttpUtils;
+import dev.JustRed23.grandfather.utils.InactivityTimer;
 import dev.JustRed23.grandfather.utils.LyricsProvider;
 import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.jdautils.JDAUtilities;
@@ -117,7 +118,6 @@ public class MusicCommands {
         return true;
     };
 
-    //TODO: add automatic disconnection after a certain amount of time / when no one is in the channel
     public static void register() {
         JDAUtilities.createSlashCommand("play", "Plays a song")
                 .addAlias("p")
@@ -164,6 +164,12 @@ public class MusicCommands {
                     //join voice channel
                     final AudioManager audioManager = AudioManager.get(event.getGuild());
                     audioManager.join(event.getMember().getVoiceState().getChannel().asVoiceChannel());
+
+                    //setup inactivity timer, only if not already set
+                    if (audioManager.getBoundChannel() == null)
+                        audioManager.getScheduler().addEventListener(InactivityTimer.create(event.getGuild()));
+
+                    //bind text channel
                     audioManager.bindTextChannel(event.getChannel().asTextChannel());
 
                     String query = event.getOption("query").getAsString();
