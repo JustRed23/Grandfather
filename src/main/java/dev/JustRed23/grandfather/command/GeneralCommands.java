@@ -1,10 +1,12 @@
 package dev.JustRed23.grandfather.command;
 
+import dev.JustRed23.grandfather.App;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.stats.SongsPerGuild;
 import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.jdautils.JDAUtilities;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
@@ -21,6 +23,10 @@ public class GeneralCommands {
                     .executes(GeneralCommands::musicStats)
                     .build()
                 .setGuildOnly()
+                .buildAndRegister();
+
+        JDAUtilities.createSlashCommand("about", "Get information about the bot")
+                .executes(GeneralCommands::about)
                 .buildAndRegister();
     }
 
@@ -113,4 +119,27 @@ public class GeneralCommands {
             });
         else event.reply("No music statistics available for this guild!").setEphemeral(true).queue();
     }
+
+    private static void about(SlashCommandInteractionEvent event) {
+        event.deferReply().queue(hook -> {
+            SelfUser bot = event.getJDA().getSelfUser();
+
+            EmbedBuilder builder = getStatBuilder(event);
+            builder.setTitle("About " + bot.getName());
+            builder.setThumbnail(bot.getEffectiveAvatarUrl());
+
+            StringBuilder description = new StringBuilder();
+            description.append("Hello! I am ").append(bot.getName()).append("\n");
+            description.append("I am here to bring people joy, play games, tell jokes and play music.");
+            builder.setDescription(description.toString());
+
+            builder.addField("Version", App.version.getVersion(), true);
+            builder.addField("Library", "JDA", true);
+            builder.addField("Creator", "JustRed23", true);
+            builder.addField("Source Code", "[GitHub](" + Bot.website_url + ")", true);
+
+            hook.editOriginalEmbeds(builder.build()).queue();
+        });
+    }
+
 }
