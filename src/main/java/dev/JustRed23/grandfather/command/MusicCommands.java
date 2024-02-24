@@ -211,7 +211,7 @@ public class MusicCommands {
                 .addCondition(IN_VOICE_CHANNEL)
                 .addCondition(BOT_NOT_PLAYING)
                 .addCondition(event -> {
-                    if (!AudioManager.get(event.getGuild()).getScheduler().isPaused()) {
+                    if (AudioManager.get(event.getGuild()).getScheduler().isPaused()) {
                         event.reply("The bot is already paused!").setEphemeral(true).queue();
                         return false;
                     }
