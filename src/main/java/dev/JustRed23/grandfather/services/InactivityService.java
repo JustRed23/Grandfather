@@ -17,6 +17,6 @@ public class InactivityService extends Service {
     }
 
     public void run() {
-        InactivityTimer.check();
+        //InactivityTimer.check();
     }
 }

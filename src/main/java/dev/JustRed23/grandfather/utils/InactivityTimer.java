@@ -29,7 +29,6 @@ public class InactivityTimer {
             }
 
             public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-                System.out.println(endReason.name() + " " + endReason.mayStartNext);
                 lastActive.put(guild, System.currentTimeMillis());
             }
         };
