@@ -86,6 +86,8 @@ public class App extends Application {
             return;
         }
 
+        LOGGER.info("Bot online, running version " + version.gitHash());
+
         //Load stats
         SongsPerGuild.load();
 
