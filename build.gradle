@@ -35,6 +35,7 @@ def updateVersion() {
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.lavalink.dev/snapshots' }
 }
 
 dependencies {
@@ -43,7 +44,7 @@ dependencies {
 
     //JDA
     implementation 'net.dv8tion:JDA:5.0.0-beta.20'
-    implementation 'com.github.JustRed23:JDA-Utilities:3.5'
+    implementation 'com.github.JustRed23:JDA-Utilities:3.6'
 
     //Lyrics
     implementation 'com.github.LowLevelSubmarine:GeniusLyricsAPI:1.0.3'
