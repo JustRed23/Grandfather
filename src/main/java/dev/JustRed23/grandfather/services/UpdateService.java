@@ -3,6 +3,7 @@ package dev.JustRed23.grandfather.services;
 import dev.JustRed23.grandfather.App;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.utils.JarUtils;
+import dev.JustRed23.jdautils.music.AudioManager;
 import dev.JustRed23.stonebrick.net.NetworkManager;
 import dev.JustRed23.stonebrick.service.Service;
 import org.json.JSONObject;
@@ -27,8 +28,7 @@ public class UpdateService extends Service {
         final String latestTag = json.getString("tag_name");
 
         if (!App.version.gitHash().equals(latestTag)) {
-            //CommandChecker.disable();
-            //AudioPlayerManager.getInstance().shutdown();
+            AudioManager.destroyAll();
 
             LOGGER.info("New version available: " + latestTag);
 

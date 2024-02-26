@@ -10,6 +10,7 @@ import dev.JustRed23.grandfather.stats.SongsPerGuild;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.Command;
 import dev.JustRed23.jdautils.data.DataStore;
+import dev.JustRed23.jdautils.music.AudioManager;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
@@ -100,6 +101,9 @@ public class App extends Application {
     protected void stop() {
         if (shardManager == null || !Bot.enabled)
             return;
+
+        //Destroy audio players
+        AudioManager.destroyAll();
 
         //Save stats
         SongsPerGuild.save();
