@@ -10,6 +10,8 @@
 
     <logger name="dev.JustRed23.abcm.Config" level="debug" />
 
+    <logger name="com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAccessTokenTracker" level="warn" />
+
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>

@@ -1,8 +1,6 @@
 package dev.JustRed23.grandfather.command;
 
 import com.google.api.services.youtube.model.SearchResult;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.JustRed23.grandfather.Bot;
@@ -47,8 +45,6 @@ public class MusicCommands {
     private static final YouTubeSource YT;
 
     static {
-        AudioSourceManagers.registerRemoteSources(new DefaultAudioPlayerManager());
-
         try {
             YT = Search.YouTube(Bot.youtube_api_key);
         } catch (GeneralSecurityException | IOException e) {

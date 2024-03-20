@@ -49,7 +49,10 @@ public final class MusicEmbeds {
         builder.setAuthor("Added playlist to queue");
         builder.setTitle(escape(playlist.getName()));
 
-        builder.setThumbnail(YouTubeSource.getThumbnail(playlist.getSelectedTrack().getInfo().identifier));
+        if (playlist.getSelectedTrack() != null)
+            builder.setThumbnail(YouTubeSource.getThumbnail(playlist.getSelectedTrack().getInfo().identifier));
+        else
+            builder.setThumbnail(YouTubeSource.getThumbnail(tracks.get(0).track().getInfo().identifier));
 
         builder.addField("Tracks", String.valueOf(tracks.size()), true);
         builder.addField("Total duration", TimeUtils.msToFormatted(totalDurationMs, TimeUtils.TimeFormat.CLOCK), true);

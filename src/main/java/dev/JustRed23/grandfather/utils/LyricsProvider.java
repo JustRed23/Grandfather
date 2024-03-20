@@ -27,12 +27,12 @@ public final class LyricsProvider {
             return builder;
         }
 
-        final LinkedList<SongSearch.Hit> hits = client.search(info.title).getHits();
+        final LinkedList<SongSearch.Hit> hits = search(info.title);
 
         if (hits.isEmpty()) {
             //Try again by removing parenthesis
             final String title = info.title.replaceAll("\\(.*?\\)", "").trim();
-            client.search(title).getHits().stream().findFirst().ifPresent(hits::add);
+            search(title).stream().findFirst().ifPresent(hits::add);
         }
 
         if (!hits.isEmpty()) {
@@ -45,6 +45,14 @@ public final class LyricsProvider {
         builder.setColor(Color.RED);
         builder.setTitle("No lyrics found for " + MarkdownSanitizer.escape(info.title));
         return builder;
+    }
+
+    private static LinkedList<SongSearch.Hit> search(String query) throws IOException {
+        try {
+            return client.search(query).getHits();
+        } catch (NullPointerException e) { //If the search fails, return an empty list
+            return new LinkedList<>();
+        }
     }
 
     private static void createEmbed(EmbedBuilder builder, SongSearch.Hit hit) {
