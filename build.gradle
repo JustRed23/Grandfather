@@ -44,7 +44,10 @@ dependencies {
 
     //JDA
     implementation 'net.dv8tion:JDA:5.0.0-beta.21'
-    implementation 'com.github.JustRed23:JDA-Utilities:3.7.1'
+    implementation ('com.github.JustRed23:JDA-Utilities:3.7.1') {
+        exclude group: 'dev.arbjerg', module: 'lavaplayer'
+    }
+    implementation 'dev.arbjerg:lavaplayer:afec211f05c9dcf0b6ee44276a02f0316ea2458a-SNAPSHOT'
 
     //Lyrics
     implementation 'com.github.LowLevelSubmarine:GeniusLyricsAPI:1.0.3'
