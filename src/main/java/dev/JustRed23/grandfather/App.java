@@ -15,6 +15,7 @@ import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
 import dev.JustRed23.stonebrick.version.GitVersion;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -74,6 +75,12 @@ public class App extends Application {
         AdminCommands.register();
         GeneralCommands.register();
         MusicCommands.register();
+
+        //default youtube source manager is deprecated, use lavaplayer's instead
+        AudioManager.registerDefaultRemoteSources = false;
+
+        YoutubeAudioSourceManager youtube = new YoutubeAudioSourceManager(false);
+        AudioManager.playerManager.registerSourceManager(youtube);
     }
 
     public static Activity getDefaultActivity() {
