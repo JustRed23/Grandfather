@@ -1,8 +1,10 @@
 package dev.JustRed23.grandfather.command;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.model.SearchResult;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.JustRed23.grandfather.App;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.ex.ErrorHandler;
 import dev.JustRed23.grandfather.stats.SongsPerGuild;
@@ -134,6 +136,12 @@ public class MusicCommands {
                                         search = YT.search(value);
                                     } catch (IOException e) {
                                         event.replyChoices(List.of()).queue();
+
+                                        if (e instanceof GoogleJsonResponseException && e.getMessage().contains("quotaExceeded")) {
+                                            App.LOGGER.warn("YouTube API request limit reached");
+                                            return;
+                                        }
+
                                         ErrorHandler.handleException("youtube-search-request", e);
                                         return;
                                     }
