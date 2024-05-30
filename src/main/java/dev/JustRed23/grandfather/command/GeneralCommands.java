@@ -8,6 +8,7 @@ import dev.JustRed23.jdautils.JDAUtilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
 import java.util.List;
@@ -71,52 +72,53 @@ public class GeneralCommands {
     }
 
     private static void musicStats(SlashCommandInteractionEvent event) {
-        if (SongsPerGuild.has(event.getGuild().getIdLong()))
-            event.deferReply().queue(hook -> {
-                EmbedBuilder builder = getStatBuilder(event);
-                builder.setTitle("Music Statistics");
+        if (SongsPerGuild.has(event.getGuild().getIdLong())) {
+            InteractionHook hook = event.deferReply().complete();
 
-                SongsPerGuild stats = SongsPerGuild.get(event.getGuild().getIdLong());
-                builder.addField("Songs played", String.valueOf(stats.getSongsPlayed()), true);
-                builder.addField("Songs skipped", String.valueOf(stats.getSongsSkipped()), true);
-                builder.addBlankField(true); //evenly spaced, like all things should be
+            EmbedBuilder builder = getStatBuilder(event);
+            builder.setTitle("Music Statistics");
 
-                //Top 5 songs
-                final List<SongsPerGuild.SongStat> songs = stats.getTopSongs(5);
+            SongsPerGuild stats = SongsPerGuild.get(event.getGuild().getIdLong());
+            builder.addField("Songs played", String.valueOf(stats.getSongsPlayed()), true);
+            builder.addField("Songs skipped", String.valueOf(stats.getSongsSkipped()), true);
+            builder.addBlankField(true); //evenly spaced, like all things should be
 
-                StringBuilder topSongs = new StringBuilder();
-                for (int i = 0; i < songs.size(); i++) {
-                    final SongsPerGuild.SongStat song = songs.get(i);
-                    topSongs.append("**").append(i + 1).append("**. ")
-                            .append(MarkdownSanitizer.escape(song.title()))
-                            .append("\n")
-                            .append("`played ").append(song.plays()).append(song.plays() == 1 ? " time" : " times").append("`")
-                            .append("\n\n");
-                }
+            //Top 5 songs
+            final List<SongsPerGuild.SongStat> songs = stats.getTopSongs(5);
 
-                builder.addField("Top Songs", topSongs.toString(), true);
+            StringBuilder topSongs = new StringBuilder();
+            for (int i = 0; i < songs.size(); i++) {
+                final SongsPerGuild.SongStat song = songs.get(i);
+                topSongs.append("**").append(i + 1).append("**. ")
+                        .append(MarkdownSanitizer.escape(song.title()))
+                        .append("\n")
+                        .append("`played ").append(song.plays()).append(song.plays() == 1 ? " time" : " times").append("`")
+                        .append("\n\n");
+            }
 
-                //Top 5 users
-                final List<SongsPerGuild.UserStat> users = stats.getTopUsers(5);
+            builder.addField("Top Songs", topSongs.toString(), true);
 
-                StringBuilder topUsers = new StringBuilder();
-                for (int i = 0; i < users.size(); i++) {
-                    final SongsPerGuild.UserStat user = users.get(i);
-                    int totalSongsPlayed = user.songsPlayed().size();
-                    topUsers.append("**").append(i + 1).append("**. ")
-                            .append(event.getGuild().retrieveMemberById(user.userID()).complete().getEffectiveName())
-                            .append("\n")
-                            .append("`").append(totalSongsPlayed).append(totalSongsPlayed == 1 ? " song" : " songs").append(" played`")
-                            .append("\n\n");
-                }
+            //Top 5 users
+            final List<SongsPerGuild.UserStat> users = stats.getTopUsers(5);
 
-                builder.addField("Top Users", topUsers.toString(), true);
+            StringBuilder topUsers = new StringBuilder();
+            for (int i = 0; i < users.size(); i++) {
+                final SongsPerGuild.UserStat user = users.get(i);
+                int totalSongsPlayed = user.songsPlayed().size();
+                topUsers.append("**").append(i + 1).append("**. ")
+                        .append(event.getGuild().retrieveMemberById(user.userID()).complete().getEffectiveName())
+                        .append("\n")
+                        .append("`").append(totalSongsPlayed).append(totalSongsPlayed == 1 ? " song" : " songs").append(" played`")
+                        .append("\n\n");
+            }
 
-                builder.addBlankField(true); //evenly spaced, like all things should be
+            builder.addField("Top Users", topUsers.toString(), true);
 
-                //Send it
-                hook.editOriginalEmbeds(builder.build()).queue();
-            });
+            builder.addBlankField(true); //evenly spaced, like all things should be
+
+            //Send it
+            hook.editOriginalEmbeds(builder.build()).queue();
+        }
         else event.reply("No music statistics available for this guild!").setEphemeral(true).queue();
     }
 
