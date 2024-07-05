@@ -42,7 +42,6 @@ public class App extends Application {
                 .setEnableShutdownHook(false)
                 .setEnabledIntents(
                         GatewayIntent.GUILD_MEMBERS,
-                        GatewayIntent.GUILD_PRESENCES,
                         GatewayIntent.GUILD_MESSAGES,
                         GatewayIntent.GUILD_MESSAGE_REACTIONS,
                         GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
@@ -57,8 +56,7 @@ public class App extends Application {
                         CacheFlag.EMOJI
                 )
                 .enableCache(
-                        CacheFlag.VOICE_STATE,
-                        CacheFlag.ONLINE_STATUS
+                        CacheFlag.VOICE_STATE
                 )
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
