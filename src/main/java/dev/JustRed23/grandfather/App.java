@@ -46,6 +46,11 @@ public class App extends Application {
                         GatewayIntent.GUILD_MESSAGE_REACTIONS,
                         GatewayIntent.GUILD_VOICE_STATES
                 )
+                .disableCache(
+                        CacheFlag.EMOJI,
+                        CacheFlag.STICKER,
+                        CacheFlag.SCHEDULED_EVENTS
+                )
                 .enableCache(
                         CacheFlag.VOICE_STATE
                 )
