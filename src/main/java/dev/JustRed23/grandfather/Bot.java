@@ -29,6 +29,9 @@ public class Bot {
     @ConfigField(defaultValue = "")
     public static String youtube_api_key;
 
+    @ConfigField(defaultValue = "")
+    public static String youtube_refresh_token;
+
     @ConfigField(defaultValue = "253219587787718658")
     public static long owner_id;
 
