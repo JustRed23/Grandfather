@@ -74,6 +74,7 @@ public class App extends Application {
         AudioManager.registerDefaultRemoteSources = false;
 
         YoutubeAudioSourceManager youtube = new YoutubeAudioSourceManager(false);
+        youtube.useOauth2(null, false);
         AudioManager.playerManager.registerSourceManager(youtube);
     }
 
