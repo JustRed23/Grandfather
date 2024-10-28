@@ -51,7 +51,7 @@ dependencies {
     implementation 'com.github.LowLevelSubmarine:GeniusLyricsAPI:1.0.3'
 
     //Logging
-    implementation 'ch.qos.logback:logback-classic:1.5.8'
+    implementation 'ch.qos.logback:logback-classic:1.5.12'
 }
 
 shadowJar {
