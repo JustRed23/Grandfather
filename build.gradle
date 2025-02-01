@@ -43,7 +43,7 @@ dependencies {
     implementation 'com.github.JustRed23:Stonebrick:v1.9.1'
 
     //JDA
-    implementation 'net.dv8tion:JDA:5.2.1'
+    implementation 'net.dv8tion:JDA:5.2.3'
     implementation 'com.github.JustRed23:JDA-Utilities:3.8.1'
     implementation 'dev.lavalink.youtube:v2:1.11.2'
 
