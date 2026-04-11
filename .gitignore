@@ -9,5 +9,5 @@ gradle-app.setting
 !gradle-wrapper.jar
 .gradletasknamecache
 config
-TESTRUN
+run
 application.properties

@@ -1,65 +1,71 @@
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "gradle.plugin.net.nemerosa:versioning:2.14.0"
-    }
-}
-
 plugins {
     id 'java'
     id 'application'
     id 'net.nemerosa.versioning' version '3.1.0'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.gradleup.shadow' version '9.4.1'
     id 'maven-publish'
 }
 
-mainClassName = 'dev.JustRed23.grandfather.App'
-group 'dev.JustRed23'
+group = 'dev.JustRed23'
 
-allprojects {
-    updateVersion()
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
-def updateVersion() {
-    ant.propertyfile(file: "./src/main/resources/application.properties") {
-        entry( key: "version", value: versioning.info.build)
-        entry( key: "buildTime", value: DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()))
+application {
+    mainClass = 'dev.JustRed23.grandfather.App'
+}
+
+def applicationPropertiesFile = layout.projectDirectory.file('src/main/resources/application.properties')
+
+tasks.register('updateVersionMetadata') {
+    outputs.file(applicationPropertiesFile)
+    outputs.upToDateWhen { false }
+    doLast {
+        ant.propertyfile(file: applicationPropertiesFile.asFile) {
+            entry(key: 'version', value: versioning.info.build)
+            entry(key: 'buildTime', value: DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(ZonedDateTime.now()))
+        }
     }
+}
+
+tasks.named('processResources') {
+    dependsOn(tasks.named('updateVersionMetadata'))
 }
 
 repositories {
     mavenCentral()
-    maven { url 'https://jitpack.io' }
-    maven { url 'https://maven.lavalink.dev/releases' }
+    maven { url = uri('https://jitpack.io') }
+    maven { url = uri('https://maven.lavalink.dev/releases') }
 }
 
 dependencies {
     //Engine
-    implementation 'com.github.JustRed23:Stonebrick:v1.9.1'
+    implementation(libs.stonebrick)
 
     //JDA
-    implementation 'net.dv8tion:JDA:5.2.3'
-    implementation 'com.github.JustRed23:JDA-Utilities:3.8.1'
-    implementation 'dev.lavalink.youtube:v2:1.11.4'
+    implementation(libs.jda)
+    implementation(libs.jda.utilities)
+    implementation(libs.lavalink.youtube)
 
     //Lyrics
-    implementation 'com.github.LowLevelSubmarine:GeniusLyricsAPI:1.0.3'
+    implementation(libs.genius.lyrics.api)
 
     //Logging
-    implementation 'ch.qos.logback:logback-classic:1.5.16'
+    implementation(libs.logback.classic)
 }
 
-shadowJar {
+tasks.named('shadowJar') {
     archiveFileName = 'Grandfather.jar'
     manifest {
         attributes('Implementation-Title': project.name, 'Implementation-Version': versioning.info.build)
     }
 
     // Prevent gradle from crashing and burning
-    dependsOn(distTar, distZip)
+    dependsOn(tasks.named('distTar'), tasks.named('distZip'))
 }

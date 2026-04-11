@@ -1,0 +1,15 @@
+[versions]
+stonebrick = "v1.9.1"
+jda = "5.6.1"
+jda-utilities = "3.8.1"
+lavalink-youtube = "1.18.0"
+genius-lyrics-api = "1.0.3"
+logback = "1.5.32"
+
+[libraries]
+stonebrick = { module = "com.github.JustRed23:Stonebrick", version.ref = "stonebrick" }
+jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
+jda-utilities = { module = "com.github.JustRed23:JDA-Utilities", version.ref = "jda-utilities" }
+lavalink-youtube = { module = "dev.lavalink.youtube:v2", version.ref = "lavalink-youtube" }
+genius-lyrics-api = { module = "com.github.LowLevelSubmarine:GeniusLyricsAPI", version.ref = "genius-lyrics-api" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
