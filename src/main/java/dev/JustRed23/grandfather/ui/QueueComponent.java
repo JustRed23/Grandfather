@@ -7,6 +7,7 @@ import dev.JustRed23.jdautils.component.SendableComponent;
 import dev.JustRed23.jdautils.component.interact.SmartButton;
 import dev.JustRed23.jdautils.music.AudioManager;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -44,7 +45,7 @@ public class QueueComponent extends SendableComponent {
 
     protected InteractionCallbackAction onReply(@NotNull SlashCommandInteractionEvent event) {
         return event.replyEmbeds(builder.build())
-                .addActionRow(back.build(), next.build(), close.build());
+                .addComponents(ActionRow.of(back.build(), next.build(), close.build()));
     }
 
     protected WebhookMessageEditAction<Message> onEdit(@NotNull InteractionHook hook) {

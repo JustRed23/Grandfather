@@ -1,5 +1,6 @@
 package dev.JustRed23.grandfather;
 
+import club.minnced.discord.jdave.interop.JDaveSessionFactory;
 import dev.JustRed23.abcm.Config;
 import dev.JustRed23.grandfather.command.AdminCommands;
 import dev.JustRed23.grandfather.command.GeneralCommands;
@@ -17,6 +18,7 @@ import dev.JustRed23.stonebrick.log.SBLogger;
 import dev.JustRed23.stonebrick.version.GitVersion;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.audio.AudioModuleConfig;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -49,10 +51,14 @@ public class App extends Application {
                 .disableCache(
                         CacheFlag.EMOJI,
                         CacheFlag.STICKER,
-                        CacheFlag.SCHEDULED_EVENTS
+                        CacheFlag.SCHEDULED_EVENTS,
+                        CacheFlag.SOUNDBOARD_SOUNDS
                 )
                 .enableCache(
                         CacheFlag.VOICE_STATE
+                )
+                .setAudioModuleConfig(new AudioModuleConfig()
+                        .withDaveSessionFactory(new JDaveSessionFactory())
                 )
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)

@@ -13,7 +13,7 @@ group = 'dev.JustRed23'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -51,6 +51,8 @@ dependencies {
     //JDA
     implementation(libs.jda)
     implementation(libs.jda.utilities)
+    implementation(libs.dave.api)
+    implementation(libs.bundles.dave.natives)
     implementation(libs.lavalink.youtube)
 
     //Lyrics

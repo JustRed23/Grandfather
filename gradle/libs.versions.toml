@@ -1,7 +1,9 @@
 [versions]
 stonebrick = "v1.9.1"
-jda = "5.6.1"
-jda-utilities = "3.8.1"
+jda = "6.4.1"
+jda-utilities = "3.9"
+dave-api = "0.1.8"
+dave-natives = "0.1.8"
 lavalink-youtube = "1.18.0"
 genius-lyrics-api = "1.0.3"
 logback = "1.5.32"
@@ -10,6 +12,14 @@ logback = "1.5.32"
 stonebrick = { module = "com.github.JustRed23:Stonebrick", version.ref = "stonebrick" }
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
 jda-utilities = { module = "com.github.JustRed23:JDA-Utilities", version.ref = "jda-utilities" }
+dave-api = { module = "club.minnced:jdave-api", version.ref = "dave-api" }
+dave-native-linux-x64 = { module = "club.minnced:jdave-native-linux-x86-64", version.ref = "dave-natives" }
+dave-native-linux-arm64 = { module = "club.minnced:jdave-native-linux-aarch64", version.ref = "dave-natives" }
+dave-native-win-x64 = { module = "club.minnced:jdave-native-win-x86-64", version.ref = "dave-natives" }
+dave-native-macos = { module = "club.minnced:jdave-native-darwin", version.ref = "dave-natives" }
 lavalink-youtube = { module = "dev.lavalink.youtube:v2", version.ref = "lavalink-youtube" }
 genius-lyrics-api = { module = "com.github.LowLevelSubmarine:GeniusLyricsAPI", version.ref = "genius-lyrics-api" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+[bundles]
+dave-natives = ["dave-native-linux-x64", "dave-native-linux-arm64", "dave-native-win-x64", "dave-native-macos"]
