@@ -17,6 +17,8 @@ import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
 import dev.JustRed23.stonebrick.version.GitVersion;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
+import dev.lavalink.youtube.clients.*;
+import dev.lavalink.youtube.clients.skeleton.Client;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.audio.AudioModuleConfig;
 import net.dv8tion.jda.api.entities.Activity;
@@ -27,6 +29,9 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class App extends Application {
 
@@ -79,7 +84,10 @@ public class App extends Application {
         //default youtube source manager is deprecated, use lavaplayer's instead
         AudioManager.registerDefaultRemoteSources = false;
 
-        YoutubeAudioSourceManager youtube = new YoutubeAudioSourceManager(false);
+        List<Client> clients = new ArrayList<>(List.of(YoutubeAudioSourceManager.DEFAULT_CLIENTS));
+        clients.add(new Tv());
+
+        YoutubeAudioSourceManager youtube = new YoutubeAudioSourceManager(false, clients.toArray(new Client[0]));
         youtube.useOauth2(Bot.youtube_refresh_token.isBlank() ? null : Bot.youtube_refresh_token, false);
         AudioManager.playerManager.registerSourceManager(youtube);
     }
