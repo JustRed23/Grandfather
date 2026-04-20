@@ -1,7 +1,7 @@
 [versions]
 stonebrick = "v1.9.1"
 jda = "6.4.1"
-jda-utilities = "3.9"
+jda-utilities = "4.0.1"
 dave-api = "0.1.8"
 dave-natives = "0.1.8"
 lavalink-youtube = "1.18.0"
