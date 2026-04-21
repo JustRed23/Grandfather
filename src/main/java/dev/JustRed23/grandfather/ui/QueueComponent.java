@@ -5,7 +5,6 @@ import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.jdautils.component.Component;
 import dev.JustRed23.jdautils.component.SendableComponent;
 import dev.JustRed23.jdautils.component.interact.SmartButton;
-import dev.JustRed23.jdautils.music.AudioManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;

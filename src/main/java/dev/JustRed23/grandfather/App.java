@@ -1,26 +1,24 @@
 package dev.JustRed23.grandfather;
 
-import club.minnced.discord.jdave.interop.JDaveSessionFactory;
 import dev.JustRed23.abcm.Config;
 import dev.JustRed23.grandfather.command.AdminCommands;
 import dev.JustRed23.grandfather.command.GeneralCommands;
 import dev.JustRed23.grandfather.command.MusicCommands;
-import dev.JustRed23.grandfather.services.InactivityService;
 import dev.JustRed23.grandfather.services.UpdateService;
 import dev.JustRed23.grandfather.stats.SongsPerGuild;
+import dev.JustRed23.jdautils.Builder;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.Command;
 import dev.JustRed23.jdautils.data.DataStore;
-import dev.JustRed23.jdautils.music.AudioManager;
+import dev.JustRed23.jdautils.music.impl.lavalink.LavalinkMusicManager;
 import dev.JustRed23.stonebrick.app.Application;
 import dev.JustRed23.stonebrick.data.FileStructure;
 import dev.JustRed23.stonebrick.log.SBLogger;
 import dev.JustRed23.stonebrick.version.GitVersion;
-import dev.lavalink.youtube.YoutubeAudioSourceManager;
-import dev.lavalink.youtube.clients.*;
-import dev.lavalink.youtube.clients.skeleton.Client;
+import dev.arbjerg.lavalink.client.Helpers;
+import dev.arbjerg.lavalink.client.LavalinkClient;
+import dev.arbjerg.lavalink.client.NodeOptions;
 import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.audio.AudioModuleConfig;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -29,9 +27,6 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class App extends Application {
 
@@ -44,7 +39,19 @@ public class App extends Application {
         LOGGER = SBLogger.getLogger(Bot.name);
         version = GitVersion.fromFile(getClass().getClassLoader().getResourceAsStream("application.properties"));
         FileStructure.discover(GFS.class);
-        builder = DefaultShardManagerBuilder.createDefault(Bot.token)
+
+        LavalinkClient client = new LavalinkClient(Helpers.getUserIdFromToken(Bot.token));
+        addNodes(client);
+
+        Builder.Configuration config = JDAUtilities.getInstance()
+                .withDatabase()
+                    .fileBased("grandfather-settings.db")
+                .withMusicManager()
+                    .useImplementation(new LavalinkMusicManager(client))
+                    .build()
+                .buildConfiguration();
+
+        builder = config.configure(DefaultShardManagerBuilder.createDefault(Bot.token))
                 .setBulkDeleteSplittingEnabled(false)
                 .setEnableShutdownHook(false)
                 .setEnabledIntents(
@@ -62,16 +69,12 @@ public class App extends Application {
                 .enableCache(
                         CacheFlag.VOICE_STATE
                 )
-                .setAudioModuleConfig(new AudioModuleConfig()
-                        .withDaveSessionFactory(new JDaveSessionFactory())
-                )
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setStatus(OnlineStatus.DO_NOT_DISTURB)
                 .setActivity(getDefaultActivity());
 
         getServicePool().addService(UpdateService.class);
-        getServicePool().addService(InactivityService.class);
 
         //Create db cache
         DataStore.createCache(1000);
@@ -80,17 +83,43 @@ public class App extends Application {
         AdminCommands.register();
         GeneralCommands.register();
         MusicCommands.register();
-
-        //default youtube source manager is deprecated, use lavaplayer's instead
-        AudioManager.registerDefaultRemoteSources = false;
-
-        List<Client> clients = new ArrayList<>(List.of(YoutubeAudioSourceManager.DEFAULT_CLIENTS));
-        clients.add(new Tv());
-
-        YoutubeAudioSourceManager youtube = new YoutubeAudioSourceManager(false, clients.toArray(new Client[0]));
-        youtube.useOauth2(Bot.youtube_refresh_token.isBlank() ? null : Bot.youtube_refresh_token, false);
-        AudioManager.playerManager.registerSourceManager(youtube);
     }
+
+    //<editor-fold desc="Lavalink Nodes">
+    private void addNodes(LavalinkClient client) {
+        client.addNode(
+                new NodeOptions.Builder()
+                        .setName("Serenetia")
+                        .setServerUri("https://lavalinkv4.serenetia.com:443")
+                        .setPassword("https://seretia.link/discord")
+                        .build()
+        );
+
+        client.addNode(
+                new NodeOptions.Builder()
+                        .setName("Jirayu")
+                        .setServerUri("https://lavalink.jirayu.net:443")
+                        .setPassword("youshallnotpass")
+                        .build()
+        );
+
+        client.addNode(
+                new NodeOptions.Builder()
+                        .setName("Millohost")
+                        .setServerUri("https://lava-v4.millohost.my.id:443")
+                        .setPassword("https://discord.gg/mjS5J2K3ep")
+                        .build()
+        );
+
+        client.addNode(
+                new NodeOptions.Builder()
+                        .setName("Triniumhost")
+                        .setServerUri("https://lavalink-v4.triniumhost.com:443")
+                        .setPassword("free")
+                        .build()
+        );
+    }
+    //</editor-fold>
 
     public static Activity getDefaultActivity() {
         return Activity.watching("TV");
@@ -109,17 +138,12 @@ public class App extends Application {
         SongsPerGuild.load();
 
         shardManager = builder.build();
-        shardManager.addEventListener(JDAUtilities.getInstance().withDatabase().fileBased("grandfather-settings.db").listener());
-
         shardManager.getShards().forEach(jda -> jda.updateCommands().addCommands(Command.globalCommands).queue());
     }
 
     protected void stop() {
         if (shardManager == null || !Bot.enabled)
             return;
-
-        //Destroy audio players
-        AudioManager.destroyAll();
 
         //Save stats
         SongsPerGuild.save();
@@ -136,7 +160,7 @@ public class App extends Application {
         return shardManager;
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Config.setDebug(true);
         launch(args);
     }

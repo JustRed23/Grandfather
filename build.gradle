@@ -51,12 +51,6 @@ dependencies {
     //JDA
     implementation(libs.jda)
     implementation(libs.jda.utilities)
-    implementation(libs.dave.api)
-    implementation(libs.bundles.dave.natives)
-    implementation(libs.lavalink.youtube)
-
-    //Lyrics
-    implementation(libs.genius.lyrics.api)
 
     //Logging
     implementation(libs.logback.classic)
