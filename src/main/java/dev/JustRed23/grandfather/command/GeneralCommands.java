@@ -3,13 +3,13 @@ package dev.JustRed23.grandfather.command;
 import dev.JustRed23.grandfather.App;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.stats.SongsPerGuild;
-import dev.JustRed23.grandfather.utils.TimeUtils;
 import dev.JustRed23.jdautils.JDAUtilities;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.SelfUser;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class GeneralCommands {
 
             //First row
             long uptimeMs = System.currentTimeMillis() - Bot.START_TIME;
-            builder.addField("Uptime", TimeUtils.msToFormatted(uptimeMs, TimeUtils.TimeFormat.FULL), true);
+            builder.addField("Start time", TimeFormat.RELATIVE.format(uptimeMs), true);
 
             double div = 1_048_576d;
             double maxMemory = Runtime.getRuntime().totalMemory() / div;

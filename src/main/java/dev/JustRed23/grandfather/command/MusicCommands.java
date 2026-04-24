@@ -20,8 +20,8 @@ import dev.JustRed23.jdautils.music.search.YouTubeSource;
 import dev.JustRed23.jdautils.utils.TimeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -30,14 +30,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public class MusicCommands {
 
-    private static final Map<Long, TextChannel> BOUND_CHANNELS = new HashMap<>();
     private static final YouTubeSource YT;
 
     static {
@@ -67,12 +64,12 @@ public class MusicCommands {
 
         assert event.getMember().getVoiceState() != null; // We know for sure that the voice state is not null here
 
-        final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
+        AudioChannel channel = gmm(event).getCurrentChannel();
 
-        if (selfVoiceState != null && selfVoiceState.inAudioChannel() && !selfVoiceState.getChannel().equals(event.getMember().getVoiceState().getChannel())) {
+        if (channel != null && !channel.equals(event.getMember().getVoiceState().getChannel())) {
             event.reply("You must be in the same voice channel as the bot to use this command!").setEphemeral(true).queue();
             return false;
-        } else if (selfVoiceState == null || !selfVoiceState.inAudioChannel()) {
+        } else if (channel == null) {
             event.reply("The bot is not in a voice channel! Use /music join to make the bot join your voice channel.").setEphemeral(true).queue();
             return false;
         }
@@ -106,6 +103,7 @@ public class MusicCommands {
     };
     //</editor-fold>
 
+    @SuppressWarnings("ConstantConditions") //suppress null warnings, as conditions handle those checks
     public static void register() {
         addListener();
 
@@ -113,8 +111,8 @@ public class MusicCommands {
                 .addSubCommand("join", "Make the bot join your voice channel")
                     .addCondition(IN_VOICE_CHANNEL)
                     .executes(event -> {
-                        BOUND_CHANNELS.put(event.getGuild().getIdLong(), event.getChannel().asTextChannel());
                         event.deferReply().queue();
+                        gmm(event).bind(event.getChannel().asTextChannel());
                         gmm(event).join(event.getMember().getVoiceState().getChannel());
                         event.getInteraction().getHook().sendMessage("Joined your voice channel!").queue();
                     })
@@ -123,7 +121,6 @@ public class MusicCommands {
                 .addSubCommand("disconnect", "Make the bot leave the voice channel")
                     .addCondition(IN_SAME_VOICE_CHANNEL)
                     .executes(event -> {
-                        BOUND_CHANNELS.remove(event.getGuild().getIdLong());
                         gmm(event).disconnect();
                         event.getInteraction().getHook().sendMessage("Left the voice channel!").queue();
                     })
@@ -173,8 +170,8 @@ public class MusicCommands {
                     )
                     .addCondition(IN_SAME_VOICE_CHANNEL)
                     .executes(event -> {
-                        BOUND_CHANNELS.put(event.getGuild().getIdLong(), event.getChannel().asTextChannel());
-                        gmm(event).play(event.getOption("query").getAsString(),  event.getMember().getVoiceState().getChannel())
+                        gmm(event).bind(event.getChannel().asTextChannel());
+                        gmm(event).play(event.getOption("query").getAsString(), event.getMember().getVoiceState().getChannel(), event.getMember());
                     })
                     .build()
 
@@ -311,29 +308,28 @@ public class MusicCommands {
     }
 
     private static void addListener() {
-        JDAUtilities.getMusicManager().addEventListener(new MusicEventListener() {
+        JDAUtilities.getMusicManager().addEventListener(new MusicEventListener() { //TODO
             public void onTrackStart(@NotNull TrackStartEvent event) {
-            }
-
-            public void onTrackEnd(@NotNull TrackEndEvent event) {
+                sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onStart(event.track()));
             }
 
             public void onTrackError(@NotNull TrackErrorEvent event) {
+                sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onError(event.track()));
+                ErrorHandler.handleException("music-track-error", event.error());
             }
 
             public void onTrackNotFound(@NotNull TrackNotFoundEvent event) {
+                sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onNotFound(event.url()));
             }
 
             public void onQueueUpdate(@NotNull QueueUpdateEvent event) {
-            }
-
-            public void onVolumeChange(@NotNull VolumeChangeEvent event) {
+                sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onQueueUpdate(event, gmm(event.guild())));
             }
         });
     }
 
-    private static void sendEmbedInBoundChannel(long guildId, EmbedBuilder embed) {
-        TextChannel channel = BOUND_CHANNELS.get(guildId);
+    private static void sendEmbedInBoundChannel(Guild guild, EmbedBuilder embed) {
+        TextChannel channel = gmm(guild).getBoundChannel();
         if (channel != null) {
             channel.sendMessageEmbeds(embed.build()).queue();
         }
@@ -341,7 +337,11 @@ public class MusicCommands {
 
     private static GuildMusicManager gmm(SlashCommandInteractionEvent event) {
         assert event.getGuild() != null; // This command is guild-only, so this should never be null
-        return JDAUtilities.getGuildMusicManager(event.getGuild());
+        return gmm(event.getGuild());
+    }
+
+    private static GuildMusicManager gmm(Guild guild) {
+        return JDAUtilities.getGuildMusicManager(guild);
     }
 
     private static void softCatch(SlashCommandInteractionEvent event, Runnable runnable) {

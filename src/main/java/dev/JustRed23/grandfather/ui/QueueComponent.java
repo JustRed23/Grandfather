@@ -1,10 +1,13 @@
 package dev.JustRed23.grandfather.ui;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import dev.JustRed23.grandfather.utils.TimeUtils;
+import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.component.Component;
 import dev.JustRed23.jdautils.component.SendableComponent;
 import dev.JustRed23.jdautils.component.interact.SmartButton;
+import dev.JustRed23.jdautils.music.GuildMusicManager;
+import dev.JustRed23.jdautils.music.PlayableTrack;
+import dev.JustRed23.jdautils.music.RepeatMode;
+import dev.JustRed23.jdautils.utils.TimeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Guild;
@@ -19,6 +22,7 @@ import net.dv8tion.jda.api.requests.restaction.interactions.InteractionCallbackA
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 
 import static net.dv8tion.jda.api.utils.MarkdownSanitizer.escape;
 
@@ -71,7 +75,7 @@ public class QueueComponent extends SendableComponent {
 
         next = SmartButton.primary(Emoji.fromFormatted("U+27A1 U+FE0F"))
                 .withListener(event -> {
-                    int page = Math.min((int) Math.ceil((double) AudioManager.get(guild).getScheduler().getQueue().size() / TRACKS_PER_PAGE) - 1, currentPage + 1);
+                    int page = Math.min((int) Math.ceil((double) JDAUtilities.getGuildMusicManager(guild).queue().getQueue().size() / TRACKS_PER_PAGE) - 1, currentPage + 1);
 
                     if (page != currentPage) {
                         currentPage = page;
@@ -85,30 +89,31 @@ public class QueueComponent extends SendableComponent {
     }
 
     private void fillEmbed() {
-        AudioManager manager = AudioManager.get(guild);
-        List<AudioTrack> queue = List.copyOf(manager.getScheduler().getQueue());
+        GuildMusicManager manager = JDAUtilities.getGuildMusicManager(guild);
+        List<PlayableTrack> queue = manager.queue().getQueue();
 
         builder = MusicEmbeds.createDefault();
 
         if (currentPage == 0) {
-            AudioTrack currentTrack = manager.getScheduler().getPlayingTrack();
-            if (currentTrack != null) {
+            Optional<PlayableTrack> currentTrack = manager.getCurrentTrack();
+            if (currentTrack.isPresent()) {
                 StringBuilder description = new StringBuilder();
                 description.append("\u23AF".repeat(30)).append("\n\n");
 
-                description.append(escape(currentTrack.getInfo().title));
-                if (manager.getScheduler().isPaused())
+                description.append(escape(currentTrack.get().getDisplayName()));
+                if (manager.isPaused())
                     description.append(" ***(Paused)***");
 
-                if (manager.getScheduler().isLooping())
-                    description.append(" ***(Looping)***");
+                RepeatMode repeatMode = manager.options().getRepeatMode();
+                if (repeatMode != RepeatMode.OFF)
+                    description.append(" ***(").append(repeatMode == RepeatMode.ONE ? "Repeating current track" : "Repeating queue").append(")***");
 
                 description.append("\n");
 
                 description.append("`")
-                        .append(TimeUtils.msToFormatted(currentTrack.getPosition(), TimeUtils.TimeFormat.CLOCK))
+                        .append(TimeUtils.millisToTime(manager.getTrackPosition()))
                         .append("` / `")
-                        .append(TimeUtils.msToFormatted(currentTrack.getDuration(), TimeUtils.TimeFormat.CLOCK))
+                        .append(TimeUtils.millisToTime(currentTrack.get().durationMillis()))
                         .append("`")
                         .append("\n");
 
@@ -122,13 +127,13 @@ public class QueueComponent extends SendableComponent {
         int end = Math.min(start + TRACKS_PER_PAGE, queue.size());
 
         StringBuilder queueBuilder = new StringBuilder();
-        queueBuilder.append("\u23AF".repeat(30));
+        queueBuilder.repeat("\u23AF", 30);
 
         for (int i = start; i < end; i++) {
-            AudioTrack track = queue.get(i);
-            queueBuilder.append("\n\n").append(i + 1).append(". ").append(escape(track.getInfo().title));
+            PlayableTrack track = queue.get(i);
+            queueBuilder.append("\n\n").append(i + 1).append(". ").append(escape(track.getDisplayName()));
             queueBuilder.append("\n").append("`")
-                    .append(TimeUtils.msToFormatted(track.getDuration(), TimeUtils.TimeFormat.CLOCK))
+                    .append(TimeUtils.millisToTime(track.durationMillis()))
                     .append("`");
         }
 
