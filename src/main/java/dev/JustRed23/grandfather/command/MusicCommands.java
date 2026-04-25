@@ -106,8 +106,6 @@ public class MusicCommands {
 
     @SuppressWarnings("ConstantConditions") //suppress null warnings, as conditions handle those checks
     public static void register() {
-        addListener();
-
         JDAUtilities.createSlashCommand("music", "All music commands")
                 .addSubCommand("join", "Make the bot join your voice channel")
                     .addCondition(IN_VOICE_CHANNEL)
@@ -128,7 +126,7 @@ public class MusicCommands {
                     .build()
 
                 .addSubCommand("play", "Play a song or playlist from YouTube")
-                    .addOption(new CommandOption(OptionType.STRING, "query", "The search query or URL of the song/playlist to play", true)
+                    .addOption(new CommandOption(OptionType.STRING, "query", "The search query or URL of the song/playlist to play", true, true)
                             .onAutoComplete(event -> {
                                 final String value = event.getFocusedOption().getValue();
                                 if (value.isBlank() || HttpUtils.isUrl(value)) {
@@ -308,8 +306,8 @@ public class MusicCommands {
                 .buildAndRegister();
     }
 
-    private static void addListener() {
-        JDAUtilities.getMusicManager().addEventListener(new MusicEventListener() { //TODO
+    public static MusicEventListener getListener() {
+        return new MusicEventListener() {
             public void onTrackStart(@NotNull TrackStartEvent event) {
                 sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onStart(event.track()));
                 SongsPerGuild.track(event.guild().getIdLong(), event.track());
@@ -327,7 +325,7 @@ public class MusicCommands {
             public void onQueueUpdate(@NotNull QueueUpdateEvent event) {
                 sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onQueueUpdate(event, gmm(event.guild())));
             }
-        });
+        };
     }
 
     private static void sendEmbedInBoundChannel(Guild guild, EmbedBuilder embed) {
