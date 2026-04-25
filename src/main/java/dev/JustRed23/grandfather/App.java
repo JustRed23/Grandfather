@@ -48,6 +48,7 @@ public class App extends Application {
                     .fileBased("grandfather-settings.db")
                 .withMusicManager()
                     .useImplementation(new LavalinkMusicManager(client))
+                    .addListener(MusicCommands.getListener())
                     .build()
                 .buildConfiguration();
 
