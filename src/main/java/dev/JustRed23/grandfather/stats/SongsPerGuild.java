@@ -1,19 +1,33 @@
 package dev.JustRed23.grandfather.stats;
 
-import com.google.gson.JsonArray;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import dev.JustRed23.grandfather.GFS;
+import dev.JustRed23.jdautils.music.PlayableTrack;
 import org.jetbrains.annotations.ApiStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class SongsPerGuild {
 
-    private static final StatStorage storage = new StatStorage(GFS.stats.getDirectory(), "song-stats.json");
-    public static final Map<Long, SongsPerGuild> stats = new HashMap<>();
+    private static final Logger log = LoggerFactory.getLogger(SongsPerGuild.class);
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    private static final Path STATS_FILE = GFS.statsFile.getPath();
+    private static final Path STATS_TEMP = GFS.statsTemp.getPath();
+
+    private static final Map<Long, SongsPerGuild> stats = new ConcurrentHashMap<>();
 
     public static SongsPerGuild get(long guildID) {
         return stats.computeIfAbsent(guildID, k -> new SongsPerGuild());
@@ -23,120 +37,136 @@ public class SongsPerGuild {
         return stats.containsKey(guildID);
     }
 
+    public static void track(long guildId, PlayableTrack track) {
+        get(guildId).play(track);
+    }
+
     public static void save() {
-        JsonObject object = new JsonObject();
-        stats.forEach((guildID, songsPerGuild) -> object.add(String.valueOf(guildID), songsPerGuild.toJsonObject()));
-        storage.save(object);
+        JsonObject root = new JsonObject();
+        stats.forEach((guildID, guild) -> root.add(String.valueOf(guildID), guild.toJson()));
+        try {
+            Files.writeString(STATS_TEMP, GSON.toJson(root));
+            Files.move(STATS_TEMP, STATS_FILE, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException e) {
+            log.error("Failed to save song stats", e);
+        }
     }
 
     public static void load() {
-        JsonObject data = storage.data;
-        if (data == null) return;
-        data.entrySet().forEach(entry -> stats.put(Long.parseLong(entry.getKey()), new SongsPerGuild(entry.getValue().getAsJsonObject())));
+        try {
+            JsonObject root = GSON.fromJson(Files.readString(STATS_FILE), JsonObject.class);
+            if (root == null) return;
+            root.entrySet().forEach(entry -> {
+                try {
+                    stats.put(Long.parseLong(entry.getKey()), SongsPerGuild.fromJson(entry.getValue().getAsJsonObject()));
+                } catch (Exception e) {
+                    log.warn("Skipping malformed entry '{}': {}", entry.getKey(), e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            log.error("Failed to load song stats", e);
+        }
     }
 
-
-
     public record SongStat(String title, int plays) {}
-    public record UserStat(long userID, List<String> songsPlayed) {}
+    public record UserStat(long userID, int plays) {}
 
-
-
-    private int songsPlayed;
-    private int songsSkipped;
-
-    private final Map<String, Integer> songsPlayedCount = new HashMap<>();
-    private final Map<Long, List<String>> songsPlayedByUser = new HashMap<>();
+    private final Map<String, AtomicInteger> songsPlayed = new ConcurrentHashMap<>();
+    private final Map<Long, AtomicInteger> songsPerUser  = new ConcurrentHashMap<>();
 
     private SongsPerGuild() {}
 
-    private SongsPerGuild(JsonObject fromData) {
-        fromJsonObject(fromData);
+    private void play(PlayableTrack track) {
+        songsPlayed.computeIfAbsent(track.title(), k -> new AtomicInteger()).incrementAndGet();
+        songsPerUser.computeIfAbsent(track.member().getIdLong(), k -> new AtomicInteger()).incrementAndGet();
     }
 
-    public void play(long userID, String title) {
-        songsPlayed++;
-        songsPlayedCount.put(title, songsPlayedCount.getOrDefault(title, 0) + 1);
-        songsPlayedByUser.computeIfAbsent(userID, k -> new ArrayList<>()).add(title);
+    public int getPlays(String title) {
+        AtomicInteger count = songsPlayed.get(title);
+        return count == null ? 0 : count.get();
     }
 
-    public void skip() {
-        songsSkipped++;
+    public int getPlays(long userID) {
+        AtomicInteger count = songsPerUser.get(userID);
+        return count == null ? 0 : count.get();
     }
 
-
-
-    public int getSongsPlayed() {
-        return songsPlayed;
+    public int getTotalPlays() {
+        return songsPlayed.values().stream().mapToInt(AtomicInteger::get).sum();
     }
 
-    public int getSongsSkipped() {
-        return songsSkipped;
+    public int getUniqueSongCount() {
+        return songsPlayed.size();
     }
 
-    public int getSongPlays(String title) {
-        return songsPlayedCount.getOrDefault(title, 0);
+    public int getUniqueUserCount() {
+        return songsPerUser.size();
     }
 
-    public List<SongStat> getTopSongs(int amount) {
-        return songsPlayedCount.entrySet().stream()
-                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-                .limit(amount)
-                .map(e -> new SongStat(e.getKey(), e.getValue()))
+    public List<SongStat> getTopSongs(int limit) {
+        return songsPlayed.entrySet().stream()
+                .sorted((a, b) -> Integer.compare(b.getValue().get(), a.getValue().get()))
+                .limit(limit)
+                .map(e -> new SongStat(e.getKey(), e.getValue().get()))
                 .toList();
     }
 
-    public List<String> getSongsPlayedByUser(long userID) {
-        return songsPlayedByUser.getOrDefault(userID, new ArrayList<>());
-    }
-
-    public List<UserStat> getTopUsers(int amount) {
-        return songsPlayedByUser.entrySet().stream()
-                .sorted((e1, e2) -> Integer.compare(e2.getValue().size(), e1.getValue().size()))
-                .limit(amount)
-                .map(e -> new UserStat(e.getKey(), e.getValue()))
+    public List<UserStat> getTopUsers(int limit) {
+        return songsPerUser.entrySet().stream()
+                .sorted((a, b) -> Integer.compare(b.getValue().get(), a.getValue().get()))
+                .limit(limit)
+                .map(e -> new UserStat(e.getKey(), e.getValue().get()))
                 .toList();
     }
 
-    @ApiStatus.Internal
-    private void fromJsonObject(JsonObject data) {
-        songsPlayed = data.get("songsPlayed").getAsInt();
-        songsSkipped = data.get("songsSkipped").getAsInt();
+    public boolean hasPlayed(String title) {
+        return songsPlayed.containsKey(title);
+    }
 
-        data.getAsJsonArray("songsPlayedCount").forEach(element -> {
-            JsonObject songObject = element.getAsJsonObject();
-            songsPlayedCount.put(songObject.get("title").getAsString(), songObject.get("plays").getAsInt());
-        });
+    public boolean hasPlayed(long userID) {
+        return songsPerUser.containsKey(userID);
+    }
 
-        data.getAsJsonObject("songsPlayedByUser").entrySet().forEach(entry -> {
-            List<String> songs = new ArrayList<>();
-            entry.getValue().getAsJsonArray().forEach(element -> songs.add(element.getAsString()));
-            songsPlayedByUser.put(Long.parseLong(entry.getKey()), songs);
-        });
+    public SongStat getMostPlayedSong() {
+        return songsPlayed.entrySet().stream()
+                .max(Comparator.comparingInt(a -> a.getValue().get()))
+                .map(e -> new SongStat(e.getKey(), e.getValue().get()))
+                .orElse(null);
+    }
+
+    public UserStat getMostActiveUser() {
+        return songsPerUser.entrySet().stream()
+                .max(Comparator.comparingInt(a -> a.getValue().get()))
+                .map(e -> new UserStat(e.getKey(), e.getValue().get()))
+                .orElse(null);
     }
 
     @ApiStatus.Internal
-    public JsonObject toJsonObject() {
+    private static SongsPerGuild fromJson(JsonObject data) {
+        SongsPerGuild instance = new SongsPerGuild();
+
+        JsonObject played = data.getAsJsonObject("songsPlayed");
+        if (played != null)
+            played.entrySet().forEach(entry -> instance.songsPlayed.put(entry.getKey(), new AtomicInteger(entry.getValue().getAsInt())));
+
+        JsonObject perUser = data.getAsJsonObject("songsPerUser");
+        if (perUser != null)
+            perUser.entrySet().forEach(entry -> instance.songsPerUser.put(Long.parseLong(entry.getKey()), new AtomicInteger(entry.getValue().getAsInt())));
+
+        return instance;
+    }
+
+    @ApiStatus.Internal
+    private JsonObject toJson() {
         JsonObject object = new JsonObject();
-        object.addProperty("songsPlayed", songsPlayed);
-        object.addProperty("songsSkipped", songsSkipped);
 
-        JsonArray songsPlayedCountArray = new JsonArray();
-        songsPlayedCount.forEach((title, plays) -> {
-            JsonObject songObject = new JsonObject();
-            songObject.addProperty("title", title);
-            songObject.addProperty("plays", plays);
-            songsPlayedCountArray.add(songObject);
-        });
-        object.add("songsPlayedCount", songsPlayedCountArray);
+        JsonObject played = new JsonObject();
+        songsPlayed.forEach((title, count) -> played.addProperty(title, count.get()));
+        object.add("songsPlayed", played);
 
-        JsonObject songsPlayedByUserObject = new JsonObject();
-        songsPlayedByUser.forEach((userID, songs) -> {
-            JsonArray songsArray = new JsonArray();
-            songs.forEach(songsArray::add);
-            songsPlayedByUserObject.add(String.valueOf(userID), songsArray);
-        });
-        object.add("songsPlayedByUser", songsPlayedByUserObject);
+        JsonObject perUser = new JsonObject();
+        songsPerUser.forEach((userID, count) -> perUser.addProperty(String.valueOf(userID), count.get()));
+        object.add("songsPerUser", perUser);
 
         return object;
     }

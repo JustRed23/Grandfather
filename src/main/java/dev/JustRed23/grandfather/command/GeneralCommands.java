@@ -79,8 +79,7 @@ public class GeneralCommands {
             builder.setTitle("Music Statistics");
 
             SongsPerGuild stats = SongsPerGuild.get(event.getGuild().getIdLong());
-            builder.addField("Songs played", String.valueOf(stats.getSongsPlayed()), true);
-            builder.addField("Songs skipped", String.valueOf(stats.getSongsSkipped()), true);
+            builder.addField("Songs played", String.valueOf(stats.getTotalPlays()), true);
             builder.addBlankField(true); //evenly spaced, like all things should be
 
             //Top 5 songs
@@ -104,7 +103,7 @@ public class GeneralCommands {
             StringBuilder topUsers = new StringBuilder();
             for (int i = 0; i < users.size(); i++) {
                 final SongsPerGuild.UserStat user = users.get(i);
-                int totalSongsPlayed = user.songsPlayed().size();
+                int totalSongsPlayed = user.plays();
                 topUsers.append("**").append(i + 1).append("**. ")
                         .append(event.getGuild().retrieveMemberById(user.userID()).complete().getEffectiveName())
                         .append("\n")

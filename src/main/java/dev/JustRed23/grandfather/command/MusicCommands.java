@@ -5,6 +5,7 @@ import com.google.api.services.youtube.model.SearchResult;
 import dev.JustRed23.grandfather.App;
 import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.ex.ErrorHandler;
+import dev.JustRed23.grandfather.stats.SongsPerGuild;
 import dev.JustRed23.grandfather.ui.MusicEmbeds;
 import dev.JustRed23.grandfather.ui.QueueComponent;
 import dev.JustRed23.grandfather.utils.HttpUtils;
@@ -311,6 +312,7 @@ public class MusicCommands {
         JDAUtilities.getMusicManager().addEventListener(new MusicEventListener() { //TODO
             public void onTrackStart(@NotNull TrackStartEvent event) {
                 sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onStart(event.track()));
+                SongsPerGuild.track(event.guild().getIdLong(), event.track());
             }
 
             public void onTrackError(@NotNull TrackErrorEvent event) {
