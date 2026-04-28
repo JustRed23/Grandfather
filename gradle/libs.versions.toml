@@ -1,11 +1,11 @@
 [versions]
 stonebrick = "v1.9.1"
 jda = "6.4.1"
-jda-utilities = "4.2.5"
+jda-utilities = "4.2.6"
 logback = "1.5.32"
 
 [libraries]
 stonebrick = { module = "com.github.JustRed23:Stonebrick", version.ref = "stonebrick" }
 jda = { module = "net.dv8tion:JDA", version.ref = "jda" }
-jda-utilities = { module = "com.github.JustRed23:JDA-Utilities", version.ref = "jda-utilities" }
+jda-utilities = { module = "com.github.JustRed23.JDA-Utilities:lavalink", version.ref = "jda-utilities" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
