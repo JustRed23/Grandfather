@@ -109,19 +109,18 @@ public class MusicCommands {
         JDAUtilities.createSlashCommand("music", "All music commands")
                 .addSubCommand("join", "Make the bot join your voice channel")
                     .addCondition(IN_VOICE_CHANNEL)
-                    .executes(event -> {
-                        event.deferReply().queue();
+                    .executes(event -> softCatch(event, () -> {
                         gmm(event).bind(event.getChannel().asTextChannel());
                         gmm(event).join(event.getMember().getVoiceState().getChannel());
-                        event.getInteraction().getHook().sendMessage("Joined your voice channel!").queue();
-                    })
+                        event.getHook().sendMessage("Joined your voice channel!").queue();
+                    }))
                     .build()
 
                 .addSubCommand("disconnect", "Make the bot leave the voice channel")
                     .addCondition(IN_SAME_VOICE_CHANNEL)
                     .executes(event -> {
                         gmm(event).disconnect();
-                        event.getInteraction().getHook().sendMessage("Left the voice channel!").queue();
+                        event.reply("Left the voice channel!").queue();
                     })
                     .build()
 
@@ -167,11 +166,24 @@ public class MusicCommands {
                                 event.replyChoices(choices).queue();
                             })
                     )
-                    .addCondition(IN_SAME_VOICE_CHANNEL)
-                    .executes(event -> {
+                    .addCondition(IN_VOICE_CHANNEL)
+                    .executes(event -> softCatch(event, () -> {
+                        //check if the user is actually in the same channel
+                        AudioChannel channel = event.getMember().getVoiceState().getChannel();
+                        AudioChannel botChannel = gmm(event).getCurrentChannel();
+
+                        if (botChannel == null) {
+                            gmm(event).join(channel);
+                        } else if (!botChannel.equals(channel)) {
+                            event.getHook().sendMessage("You must be in the same voice channel as the bot to use this command!").setEphemeral(true).queue();
+                            return;
+                        }
+
+                        event.getHook().deleteOriginal().queue();
+
                         gmm(event).bind(event.getChannel().asTextChannel());
                         gmm(event).play(event.getOption("query").getAsString(), event.getMember().getVoiceState().getChannel(), event.getMember());
-                    })
+                    }))
                     .build()
 
                 .addSubCommand("pause", "Pause the currently playing song")
@@ -197,9 +209,9 @@ public class MusicCommands {
                     .addCondition(BOT_IS_PLAYING)
                     .executes(event -> softCatch(event, () -> {
                         if (gmm(event).queue().skip())
-                            ;//TODO: reply with a fancy embed
+                            event.getHook().sendMessage("Skipped the current song!").queue();
                         else
-                            event.reply("There are no more songs in the queue, stopped playing").queue();
+                            event.getHook().sendMessage("There are no more songs in the queue, stopped playing").queue();
                     }))
                     .build()
 
@@ -208,9 +220,9 @@ public class MusicCommands {
                     .addCondition(BOT_IS_PLAYING)
                     .executes(event -> softCatch(event, () -> {
                         if (gmm(event).queue().back())
-                            ;//TODO: reply with a fancy embed
+                            event.getHook().sendMessage("Went back to the previous song!").queue();
                         else
-                            event.reply("There is nothing to go back to").queue();
+                            event.getHook().sendMessage("There is nothing to go back to").queue();
                     }))
                     .build()
 
@@ -235,7 +247,7 @@ public class MusicCommands {
                     .executes(event -> softCatch(event, () -> {
                         String posStr = event.getOption("position").getAsString();
                         gmm(event).seek(TimeUtils.timeToMillis(posStr));
-                        event.getInteraction().getHook().sendMessage("Seeked to " + posStr + "!").queue();
+                        event.getHook().sendMessage("Seeked to " + posStr + "!").queue();
                     }))
                     .build()
 
@@ -244,7 +256,7 @@ public class MusicCommands {
                     .addCondition(QUEUE_NOT_EMPTY)
                     .executes(event -> softCatch(event, () -> {
                         gmm(event).queue().shuffle();
-                        event.getInteraction().getHook().sendMessage("Shuffled music queue!").queue();
+                        event.getHook().sendMessage("Shuffled music queue!").queue();
                     }))
                     .build()
 
@@ -255,7 +267,7 @@ public class MusicCommands {
                     .executes(event -> softCatch(event, () -> {
                         int pos = event.getOption("position").getAsInt() - 1;
                         gmm(event).queue().remove(pos);
-                        event.getInteraction().getHook().sendMessage("Removed song at position " + (pos + 1) + " from the queue!").queue();
+                        event.getHook().sendMessage("Removed song at position " + (pos + 1) + " from the queue!").queue();
                     }))
                     .build()
 
@@ -268,14 +280,15 @@ public class MusicCommands {
                         int from = event.getOption("from").getAsInt() - 1;
                         int to = event.getOption("to").getAsInt() - 1;
                         gmm(event).queue().move(from, to);
-                        event.getInteraction().getHook().sendMessage("Moved song from position " + (from + 1) + " to position " + (to + 1) + " in the queue!").queue();
+                        event.getHook().sendMessage("Moved song from position " + (from + 1) + " to position " + (to + 1) + " in the queue!").queue();
                     }))
                     .build()
 
                 .addSubCommand("nowplaying", "Show the currently playing song")
-                    .executes(event -> {
-                        //TODO: reply with a fancy embed, reply with an embed saying no track playing if getCurrentTrack is empty
-                    })
+                    .executes(event -> softCatch(event, () -> {
+                        var embed = MusicEmbeds.onNowPlaying(gmm(event)).build();
+                        event.getHook().sendMessageEmbeds(embed).queue();
+                    }))
                     .build()
 
                 .addSubCommand("volume", "Set the music volume (0-100)")
@@ -283,7 +296,8 @@ public class MusicCommands {
                     .addCondition(IN_SAME_VOICE_CHANNEL)
                     .executes(event -> softCatch(event, () -> {
                         int level = event.getOption("level").getAsInt();
-                        gmm(event).options().setVolume(level / 100f);
+                        gmm(event).options().setVolume(level);
+                        event.getHook().sendMessage("Volume changed!").queue();
                     }))
                     .build()
 
@@ -298,7 +312,7 @@ public class MusicCommands {
                         String mode = event.getOption("mode").getAsString();
                         RepeatMode repeatMode = RepeatMode.get(mode);
                         gmm(event).options().setRepeatMode(repeatMode);
-                        event.getInteraction().getHook().sendMessage("Set repeat mode to " + mode + "!").queue();
+                        event.getHook().sendMessage("Set repeat mode to " + mode + "!").queue();
                     }))
                     .build()
 
@@ -325,6 +339,10 @@ public class MusicCommands {
             public void onQueueUpdate(@NotNull QueueUpdateEvent event) {
                 sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onQueueUpdate(event, gmm(event.guild())));
             }
+
+            public void onVolumeChange(@NotNull VolumeChangeEvent event) {
+                sendEmbedInBoundChannel(event.guild(), MusicEmbeds.onVolumeChange(event.oldVolume(), event.newVolume()));
+            }
         };
     }
 
@@ -349,7 +367,8 @@ public class MusicCommands {
         try {
             runnable.run();
         } catch (RuntimeException e) {
-            event.getInteraction().getHook().sendMessage(e.getMessage()).queue();
+            event.getHook().sendMessage(e.getMessage()).queue();
+            ErrorHandler.handleException("music-command-error", e);
         }
     }
 }
