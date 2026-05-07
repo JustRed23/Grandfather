@@ -45,8 +45,7 @@ public class GeneralCommands {
             builder.setThumbnail(event.getJDA().getSelfUser().getEffectiveAvatarUrl());
 
             //First row
-            long uptimeMs = System.currentTimeMillis() - Bot.START_TIME;
-            builder.addField("Start time", TimeFormat.RELATIVE.format(uptimeMs), true);
+            builder.addField("Start time", TimeFormat.RELATIVE.format(Bot.START_TIME), true);
 
             double div = 1_048_576d;
             double maxMemory = Runtime.getRuntime().totalMemory() / div;
