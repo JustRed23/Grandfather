@@ -19,11 +19,12 @@ public final class LavalinkUtils {
         String json = String.join("", content);
         NodesFile file = GSON.fromJson(json, NodesFile.class);
 
+        if (file == null || file.nodes == null) return;
         Arrays.stream(file.nodes).forEach(node ->
                 client.addNode(new NodeOptions.Builder()
-                        .setName(node.getName())
-                        .setServerUri(node.getUrl())
-                        .setPassword(node.getPassword())
+                        .setName(node.name)
+                        .setServerUri(node.url)
+                        .setPassword(node.password)
                         .build())
         );
     }
@@ -35,18 +36,6 @@ public final class LavalinkUtils {
             private String name;
             private String url;
             private String password;
-
-            public String getName() {
-                return name;
-            }
-
-            public String getUrl() {
-                return url;
-            }
-
-            public String getPassword() {
-                return password;
-            }
         }
     }
 }
