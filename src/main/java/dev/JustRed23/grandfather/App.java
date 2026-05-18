@@ -6,6 +6,7 @@ import dev.JustRed23.grandfather.command.GeneralCommands;
 import dev.JustRed23.grandfather.command.MusicCommands;
 import dev.JustRed23.grandfather.services.UpdateService;
 import dev.JustRed23.grandfather.stats.SongsPerGuild;
+import dev.JustRed23.grandfather.utils.LavalinkUtils;
 import dev.JustRed23.jdautils.Builder;
 import dev.JustRed23.jdautils.JDAUtilities;
 import dev.JustRed23.jdautils.command.Command;
@@ -17,7 +18,6 @@ import dev.JustRed23.stonebrick.log.SBLogger;
 import dev.JustRed23.stonebrick.version.GitVersion;
 import dev.arbjerg.lavalink.client.Helpers;
 import dev.arbjerg.lavalink.client.LavalinkClient;
-import dev.arbjerg.lavalink.client.NodeOptions;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -34,14 +34,14 @@ public class App extends Application {
     public static GitVersion version;
     private static ShardManager shardManager;
     private DefaultShardManagerBuilder builder;
+    private LavalinkClient client;
 
     protected void init() {
         LOGGER = SBLogger.getLogger(Bot.name);
         version = GitVersion.fromFile(getClass().getClassLoader().getResourceAsStream("application.properties"));
         FileStructure.discover(GFS.class);
 
-        LavalinkClient client = new LavalinkClient(Helpers.getUserIdFromToken(Bot.token));
-        addNodes(client);
+        client = new LavalinkClient(Helpers.getUserIdFromToken(Bot.token));
 
         Builder.Configuration config = JDAUtilities.getInstance()
                 .withDatabase()
@@ -86,42 +86,6 @@ public class App extends Application {
         MusicCommands.register();
     }
 
-    //<editor-fold desc="Lavalink Nodes">
-    private void addNodes(LavalinkClient client) {
-        client.addNode(
-                new NodeOptions.Builder()
-                        .setName("Serenetia")
-                        .setServerUri("https://lavalinkv4.serenetia.com:443")
-                        .setPassword("https://seretia.link/discord")
-                        .build()
-        );
-
-        client.addNode(
-                new NodeOptions.Builder()
-                        .setName("Jirayu")
-                        .setServerUri("https://lavalink.jirayu.net:443")
-                        .setPassword("youshallnotpass")
-                        .build()
-        );
-
-        client.addNode(
-                new NodeOptions.Builder()
-                        .setName("Millohost")
-                        .setServerUri("https://lava-v4.millohost.my.id:443")
-                        .setPassword("https://discord.gg/mjS5J2K3ep")
-                        .build()
-        );
-
-        client.addNode(
-                new NodeOptions.Builder()
-                        .setName("Triniumhost")
-                        .setServerUri("https://lavalink-v4.triniumhost.com:443")
-                        .setPassword("free")
-                        .build()
-        );
-    }
-    //</editor-fold>
-
     public static Activity getDefaultActivity() {
         return Activity.watching("TV");
     }
@@ -134,6 +98,9 @@ public class App extends Application {
         }
 
         LOGGER.info("Bot online, running version " + version.gitHash());
+
+        //Load clients
+        LavalinkUtils.addNodes(client);
 
         //Load stats
         SongsPerGuild.load();
