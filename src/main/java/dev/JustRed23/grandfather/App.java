@@ -18,6 +18,7 @@ import dev.JustRed23.stonebrick.log.SBLogger;
 import dev.JustRed23.stonebrick.version.GitVersion;
 import dev.arbjerg.lavalink.client.Helpers;
 import dev.arbjerg.lavalink.client.LavalinkClient;
+import dev.arbjerg.lavalink.client.LavalinkNode;
 import dev.arbjerg.lavalink.client.loadbalancing.builtin.VoiceRegionPenaltyProvider;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -28,6 +29,8 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
+
+import java.util.List;
 
 public class App extends Application {
 
@@ -124,6 +127,10 @@ public class App extends Application {
             jda.getHttpClient().connectionPool().evictAll();
             jda.getHttpClient().dispatcher().executorService().shutdown();
         });
+    }
+
+    public static List<LavalinkNode> getNodes() {
+        return client.getNodes();
     }
 
     public static void refreshNodes() {
