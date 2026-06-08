@@ -16,6 +16,6 @@ public class GFS {
     @File(name = "stats.json.tmp", directory = "stats", content = "{}")
     public static dev.JustRed23.stonebrick.data.File statsTemp;
 
-    @File(name = "nodes.json", content = "{}")
+    @File(name = "nodes.json", content = "[]")
     public static dev.JustRed23.stonebrick.data.File nodesFile;
 }
