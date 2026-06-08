@@ -34,7 +34,7 @@ public class UpdateService extends Service {
                     .asFile(JarUtils.getJarFile());
 
             LOGGER.info("Updated to version " + latestTag);
-            App.exit();
+            System.exit(0);
         }
     }
 }
