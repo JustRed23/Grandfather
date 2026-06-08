@@ -50,7 +50,7 @@ public final class LavalinkUtils {
         private String version;
 
         public boolean isValid() {
-            return Objects.equals(version, "v4") && HttpUtils.isValid(host);
+            return (version == null || version.equals("v4")) && HttpUtils.isValid(host);
         }
 
         public NodeOptions toOptions() {
