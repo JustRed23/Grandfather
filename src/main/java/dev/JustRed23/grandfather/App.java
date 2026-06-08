@@ -18,6 +18,7 @@ import dev.JustRed23.stonebrick.log.SBLogger;
 import dev.JustRed23.stonebrick.version.GitVersion;
 import dev.arbjerg.lavalink.client.Helpers;
 import dev.arbjerg.lavalink.client.LavalinkClient;
+import dev.arbjerg.lavalink.client.loadbalancing.builtin.VoiceRegionPenaltyProvider;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -42,6 +43,7 @@ public class App extends Application {
         FileStructure.discover(GFS.class);
 
         client = new LavalinkClient(Helpers.getUserIdFromToken(Bot.token));
+        client.getLoadBalancer().addPenaltyProvider(new VoiceRegionPenaltyProvider());
 
         Builder.Configuration config = JDAUtilities.getInstance()
                 .withDatabase()
