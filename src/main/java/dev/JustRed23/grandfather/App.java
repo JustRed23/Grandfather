@@ -33,8 +33,8 @@ public class App extends Application {
     public static Logger LOGGER;
     public static GitVersion version;
     private static ShardManager shardManager;
+    private static LavalinkClient client;
     private DefaultShardManagerBuilder builder;
-    private LavalinkClient client;
 
     protected void init() {
         LOGGER = SBLogger.getLogger(Bot.name);
@@ -100,7 +100,7 @@ public class App extends Application {
         LOGGER.info("Bot online, running version " + version.gitHash());
 
         //Load clients
-        LavalinkUtils.addNodes(client);
+        refreshNodes();
 
         //Load stats
         SongsPerGuild.load();
@@ -122,6 +122,11 @@ public class App extends Application {
             jda.getHttpClient().connectionPool().evictAll();
             jda.getHttpClient().dispatcher().executorService().shutdown();
         });
+    }
+
+    public static void refreshNodes() {
+        if (client != null)
+            LavalinkUtils.addNodes(client);
     }
 
     public static ShardManager getShardManager() {
