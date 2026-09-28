@@ -3,6 +3,7 @@ package dev.JustRed23.grandfather.utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dev.JustRed23.grandfather.App;
+import dev.JustRed23.grandfather.Bot;
 import dev.JustRed23.grandfather.GFS;
 import dev.arbjerg.lavalink.client.LavalinkClient;
 import dev.arbjerg.lavalink.client.NodeOptions;
@@ -19,12 +20,14 @@ public final class LavalinkUtils {
     public static void addNodes(LavalinkClient client) {
         client.getNodes().forEach(client::removeNode);
 
-        try {
-            String response = HttpUtils.sendRequest("https://lavalink-list.ajieblogs.eu.org/All");
-            Node[] nodes = GSON.fromJson(response, Node[].class);
-            addNodes(nodes, client);
-        } catch (Exception e) {
-            App.LOGGER.error("Failed to fetch Lavalink nodes", e);
+        if (Bot.auto_add_nodes) {
+            try {
+                String response = HttpUtils.sendRequest("https://lavalink-list.ajieblogs.eu.org/All");
+                Node[] nodes = GSON.fromJson(response, Node[].class);
+                addNodes(nodes, client);
+            } catch (Exception e) {
+                App.LOGGER.error("Failed to fetch Lavalink nodes", e);
+            }
         }
 
         final List<String> content = GFS.nodesFile.getContent();

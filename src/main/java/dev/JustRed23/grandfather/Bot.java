@@ -14,6 +14,9 @@ public class Bot {
     @ConfigField(defaultValue = "true")
     public static boolean auto_update;
 
+    @ConfigField(defaultValue = "true")
+    public static boolean auto_add_nodes;
+
     @ConfigField(defaultValue = "Grandfather")
     public static String name;
 
